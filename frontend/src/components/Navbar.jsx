@@ -1,48 +1,80 @@
 "use client";
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const timeoutRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    clearTimeout(timeoutRef.current);
+    setIsDropdownVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => setIsDropdownVisible(false), 200);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
   return (
     <header className={styles.navbar}>
       {/* Left Brand Section */}
       <div className={styles.leftSection}>
         <div className={styles.brand}>
-          {/* <img
-            src="/img/keka-logo-white.png"
-            alt="logo"
-            className={styles.logo}
-          /> */}
+          <Link to='/employee-dashboard' className="text-decoration-none">
           <span className={styles.brandText}>SENSE PROJECTS</span>
+          </Link>
         </div>
       </div>
 
-      {/* Center Search */}
-      {/* <div className={styles.centerSection}>
-        <div className={styles.searchWrapper}>
-          <i className={`bi bi-search ${styles.searchIcon}`}></i>
-          <input
-            type="text"
-            placeholder="Search employees or actions (Ex: Apply Leave)"
-            className={styles.searchInput}
-          />
-          <span className={styles.shortcut}>Alt + K</span>
-        </div>
-      </div> */}
-
-      {/* Right User / Notification Section */}
+      {/* Right User Section */}
       <div className={styles.rightSection}>
         <i className={`bi bi-bell ${styles.notification}`}></i>
-        <div className={styles.avatarWrapper}>
-          <img
-            src="/img/profile.jpg"
-            alt="User"
-            className={styles.avatar}
-          />
+
+        {/* Avatar + Dropdown */}
+        <div
+          className={styles.profileWrapper}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className={styles.avatarWrapper}>
+            <img
+              src="/img/profile.jpg"
+              alt="User"
+              className={styles.avatar}
+            />
+          </div>
+
+          {isDropdownVisible && (
+            <div
+              className={styles.profileDropdown}
+              onMouseEnter={() => clearTimeout(timeoutRef.current)}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div className={styles.userInfo}>
+                <strong>{user?.name || "John Doe"}</strong>
+                <small>{user?.designation || "Software Engineer"}</small>
+              </div>
+              <hr className={styles.dropdownDivider} />
+              <Link to="/profile" className={styles.dropdownItem}>
+                <i className="bi bi-person me-2"></i> Edit Profile
+              </Link>
+              <Link to="/id-card" className={styles.dropdownItem}>
+                <i className="bi bi-card-text me-2"></i> View ID Card
+              </Link>
+              <button onClick={handleLogout} className={styles.dropdownItem}>
+                <i className="bi bi-box-arrow-right me-2"></i> Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

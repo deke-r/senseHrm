@@ -24,6 +24,11 @@ export default function Sidebar() {
 
   const menuItems = [
     {
+        icon: "bi-house",
+        label: "Home",
+        path: "/employee-dashboard",
+      },
+    {
       icon: "bi-person",
       label: "Me",
       subItems: [

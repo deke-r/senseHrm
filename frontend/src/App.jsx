@@ -20,6 +20,7 @@ import Leaves from "./pages/Leaves"
 import Attendance from "./pages/Attendance"
 import WFH from "./pages/WFH"
 import Feed from "./pages/Feed"
+import Profile from "./pages/Profile"
 
 export default function App() {
   const { isAuthenticated, loading, user } = useAuth()
@@ -93,6 +94,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Employees />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

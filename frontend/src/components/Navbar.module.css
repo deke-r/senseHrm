@@ -25,57 +25,11 @@
   gap: 10px;
 }
 
-.logo {
-  height: 26px;
-  width: auto;
-}
-
 .brandText {
   font-weight: 600;
   font-size: 14px;
   color: #fff;
   letter-spacing: 0.5px;
-}
-
-/* --- CENTER SECTION (SEARCH) --- */
-.centerSection {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.searchWrapper {
-  background-color: #ffffff;
-  display: flex;
-  align-items: center;
-  padding: 4px 12px;
-  border-radius: 30px;
-  width: 480px;
-  position: relative;
-}
-
-.searchIcon {
-  color: #666;
-  font-size: 16px;
-  margin-right: 10px;
-}
-
-.searchInput {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 13px;
-  color: #333;
-}
-
-.shortcut {
-  background: #f0f0f0;
-  color: #666;
-  font-size: 11px;
-  font-weight: 500;
-  padding: 3px 8px;
-  border-radius: 16px;
-  white-space: nowrap;
 }
 
 /* --- RIGHT SECTION --- */
@@ -92,12 +46,18 @@
   position: relative;
 }
 
+/* --- PROFILE --- */
+.profileWrapper {
+  position: relative;
+}
+
 .avatarWrapper {
   height: 36px;
   width: 36px;
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid #fff;
+  cursor: pointer;
 }
 
 .avatar {
@@ -106,13 +66,81 @@
   object-fit: cover;
 }
 
-/* --- RESPONSIVE --- */
-@media (max-width: 992px) {
-  .searchWrapper {
-    width: 300px;
+/* --- DROPDOWN --- */
+.profileDropdown {
+  position: absolute;
+  right: 0;
+  top: 45px;
+  background: #ffffff;
+  border-radius: 0px !important;
+  color: #333;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  width: 220px;
+  padding: 0px 0;
+  animation: fadeIn 0.2s ease-in-out;
+  z-index: 1000;
+}
+
+.userInfo {
+  padding: 6px 16px;
+  line-height: 1.4;
+}
+
+.userInfo strong {
+  display: block;
+  color: #222;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.userInfo small {
+  color: #888;
+  font-size: 12px;
+}
+
+.dropdownDivider {
+  margin: 6px 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: #333;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.dropdownItem:hover {
+  background: #f5f5f5;
+}
+
+.dropdownItem i {
+  font-size: 15px;
+  color: #5e9c76;
+}
+
+/* --- ANIMATION --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
+/* --- RESPONSIVE --- */
 @media (max-width: 768px) {
   .navbar {
     flex-wrap: wrap;
@@ -120,21 +148,12 @@
     padding: 10px;
   }
 
-  .centerSection {
-    order: 3;
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  .searchWrapper {
-    width: 100%;
-  }
-
   .rightSection {
     gap: 10px;
   }
 
-  .shortcut {
-    display: none;
+  .profileDropdown {
+    right: 10px;
+    width: 180px;
   }
 }

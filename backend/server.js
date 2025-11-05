@@ -4,6 +4,7 @@ import bodyParser from "body-parser"
 import dotenv from "dotenv"
 import routes from "./routes/routes.js"
 import postsRouter from "./routes/posts.js";
+import profileRoutes from "./routes/profile.js";
 import path from "path";
 
 import { fileURLToPath } from "url";
@@ -34,6 +35,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Routes
 app.use("/api", routes)
 app.use("/api/posts", postsRouter);
+app.use("/api/profile", profileRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
