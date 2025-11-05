@@ -1,0 +1,198 @@
+/* === BASE SIDEBAR === */
+.sidebar {
+    width: 80px;
+    background-color: #0d2233;
+    height: 100vh;
+    color: #cfd8e3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+  }
+  
+  .logoArea {
+    height: 60px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    border-bottom: 1px solid #1f3e5a;
+    letter-spacing: 1px;
+  }
+  
+  .menu {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  /* === MAIN MENU ITEMS === */
+  .menuWrapper {
+    position: relative;
+    width: 100%;
+  }
+  
+  .menuItem {
+    width: 100%;
+    color: gray;
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 0;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .menuItem:hover,
+  .menuItem.active {
+    background-color: #1f3e5a;
+    color: #ffffff;
+  }
+  
+  .icon {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  
+  .label {
+    font-size: 12px;
+    line-height: 1;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  /* === HOVER SUBMENU === */
+  .submenu {
+    position: absolute;
+    left: 80px;
+    top: 0;
+    background: #10283e;
+    min-width: 200px;
+    border: 1px solid #1f3e5a;
+    padding: 8px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    animation: fadeIn 0.2s ease-in-out;
+    z-index: 999;
+  }
+  
+  .submenuLink,
+  .submenuTitle {
+    display: block;
+    color: #cfd8e3;
+    text-decoration: none;
+    font-size: 13px;
+    padding: 8px 16px;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  
+  .submenuLink:hover,
+  .submenuTitle:hover {
+    background: #1f3e5a;
+    color: #fff;
+  }
+  
+  /* === SUBMENU GROUP === */
+  .submenuGroup {
+    position: relative;
+  }
+  
+  .submenuTitle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .submenuInner {
+    position: absolute;
+    left: 200px;
+    top: 0;
+    background: #0e2032;
+    min-width: 200px;
+    border: 1px solid #1f3e5a;
+    display: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  }
+  
+  .submenuGroup:hover .submenuInner {
+    display: block;
+  }
+  
+  /* === ACTIVE STATE === */
+  .activeSub {
+    background: #1f3e5a;
+    color: #fff;
+  }
+  
+  /* === FADE/SLIDE ANIMATION === */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateX(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  /* === HOVER BRIDGE FIX === */
+  .menuWrapper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 80px;
+    width: 15px;
+    height: 100%;
+    background: transparent;
+  }
+  
+  /* === RESPONSIVE SIDEBAR === */
+  @media (max-width: 768px) {
+    .sidebar {
+      flex-direction: row;
+      width: 100%;
+      height: 60px;
+      justify-content: space-around;
+      position: fixed;
+      bottom: 0;
+      z-index: 9999;
+    }
+  
+    .menu {
+      flex-direction: row;
+      margin: 0;
+      width: auto;
+      gap: 0;
+    }
+  
+    .menuItem {
+      flex: 1;
+      padding: 8px 0;
+    }
+  
+    .icon {
+      margin-bottom: 2px;
+    }
+  
+    .label {
+      font-size: 10px;
+    }
+  
+    /* Hide hover menus on mobile */
+    .submenu {
+      display: none !important;
+    }
+  }
+  

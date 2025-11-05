@@ -1,0 +1,292 @@
+/* Simplified clean signup page with two-column layout matching login design */
+
+.signupContainer {
+  display: flex;
+  height: 100vh;
+  background: #ffffff;
+}
+
+.signupImageSection {
+  flex: 1;
+  background: linear-gradient(135deg, #2986ce 0%, #1e5fa8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.imageOverlay {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.brandContent {
+  color: white;
+  animation: slideUp 0.8s ease-out;
+}
+
+.brandContent h2 {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.brandContent p {
+  font-size: 16px;
+  opacity: 0.95;
+  margin-bottom: 48px;
+  line-height: 1.5;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  display: inline-block;
+}
+
+.featureList li {
+  font-size: 15px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  opacity: 0.95;
+  transition: all 0.3s ease;
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.featureList li i {
+  font-size: 18px;
+  margin-right: 12px;
+  margin-top: 2px;
+}
+
+.featureList li:nth-child(1) {
+  animation-delay: 0.3s;
+}
+
+.featureList li:nth-child(2) {
+  animation-delay: 0.4s;
+}
+
+.featureList li:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+.featureList li:nth-child(4) {
+  animation-delay: 0.6s;
+}
+
+.featureList li:hover {
+  transform: translateX(8px);
+}
+
+.signupFormSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 60px 80px;
+  background: #ffffff;
+  animation: slideRight 0.8s ease-out;
+  overflow-y: auto;
+}
+
+.formWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.formHeader {
+  margin-bottom: 40px;
+}
+
+.formHeader h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #222222;
+  margin-bottom: 8px;
+}
+
+.formHeader p {
+  font-size: 14px;
+  color: #777777;
+  margin: 0;
+}
+
+.signupFormSection form .form-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #222222;
+  margin-bottom: 8px;
+}
+
+.signupFormSection form .form-control,
+.signupFormSection form .form-select {
+  border: 1px solid #d8dde6;
+  border-radius: 4px;
+  padding: 12px 14px;
+  font-size: 14px;
+  height: 44px;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+}
+
+.signupFormSection form .form-control:focus,
+.signupFormSection form .form-select:focus {
+  border-color: #2986ce;
+  box-shadow: 0 0 0 3px rgba(41, 134, 206, 0.1);
+  outline: none;
+}
+
+.submitBtn {
+  height: 48px;
+  background: #2986ce;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 24px;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: #1e5fa8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(41, 134, 206, 0.3);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.errorText {
+  color: #fa5f5f;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.formFooter {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e4e6e9;
+  text-align: center;
+}
+
+.formFooter p {
+  font-size: 14px;
+  color: #777777;
+  margin: 0;
+}
+
+.loginLink {
+  color: #2986ce;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.loginLink:hover {
+  color: #1e5fa8;
+}
+
+.bottomFooter {
+  font-size: 12px;
+  color: #afafaf;
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid #e4e6e9;
+}
+
+.bottomFooter a {
+  color: #2986ce;
+  text-decoration: none;
+}
+
+.bottomFooter a:hover {
+  text-decoration: underline;
+}
+
+/* Animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .signupFormSection {
+    padding: 40px 50px;
+  }
+}
+
+@media (max-width: 768px) {
+  .signupContainer {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .signupImageSection {
+    padding: 40px 20px;
+    min-height: 300px;
+  }
+
+  .brandContent h2 {
+    font-size: 32px;
+  }
+
+  .brandContent p {
+    font-size: 14px;
+  }
+
+  .featureList li {
+    font-size: 14px;
+  }
+
+  .signupFormSection {
+    padding: 40px 20px;
+    min-height: auto;
+  }
+
+  .formWrapper {
+    justify-content: flex-start;
+  }
+}

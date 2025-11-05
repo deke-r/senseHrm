@@ -1,0 +1,214 @@
+/* Bootstrap-based employees management page */
+
+.employeesContainer {
+  min-height: calc(100vh - 70px);
+  background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+  padding: 40px 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.subtitle {
+  color: #7f8c8d;
+  margin: 5px 0 0 0;
+  font-size: 14px;
+}
+
+.addBtn {
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 20px !important;
+  transition: all 0.3s ease;
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.addBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.searchCard {
+  border: none;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  animation: fadeIn 0.6s ease-out 0.1s both;
+}
+
+.searchCard .input-group-text {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  color: #0d6efd;
+}
+
+.searchCard .form-control {
+  border: 1px solid #e9ecef;
+  border-left: none;
+}
+
+.searchCard .form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.tableCard {
+  border: none;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: fadeIn 0.6s ease-out 0.2s both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tableHead {
+  background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 100%);
+  font-weight: 700;
+  color: #2c3e50;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.tableHead th {
+  padding: 16px 12px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tableRow {
+  transition: all 0.3s ease;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.tableRow:hover {
+  background-color: #f8f9fa;
+  transform: scaleX(1.01);
+  box-shadow: inset 4px 0 0 #0d6efd;
+}
+
+.badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 12px;
+  display: inline-block;
+}
+
+.actionBtn {
+  font-weight: 600;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  padding: 6px 10px !important;
+}
+
+.actionBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modalContent {
+  border: none;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalContent .form-control,
+.modalContent .form-select {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.modalContent .form-control:focus,
+.modalContent .form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .addBtn {
+    width: 100%;
+    text-align: center;
+  }
+}

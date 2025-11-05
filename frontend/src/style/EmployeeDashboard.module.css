@@ -1,0 +1,21 @@
+.layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f6f8fa;
+  }
+  
+  main {
+    margin-left: 80px;
+  }
+  
+  .banner {
+    background-image: url("../../public/img/bg-dash.png");
+    background-size: cover;
+    background-position: center;
+    color: white;
+    font-weight: 600;
+    padding: 17px 16px;
+    border-radius: 4px;
+    margin: 20px;
+  }
+  
