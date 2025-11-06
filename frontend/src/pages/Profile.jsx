@@ -381,7 +381,7 @@ const ProfileSection = ({
   handleEditClick,
   isList = false,
 }) => (
-  <div className={styles.card}>
+  <div className={`rounded-0 ${styles.card}`}>
     <div className={styles.cardHeader}>
       <h6 className={styles.cardTitle}>{title}</h6>
       <button className={styles.editBtn} onClick={() => handleEditClick(section)}>
@@ -432,7 +432,7 @@ const PersonalDetails = ({
   handleSave,
   handleEditClick,
 }) => (
-  <div className={styles.card}>
+  <div className={`rounded-0 ${styles.card}`}>
     <div className={styles.cardHeader}>
       <h6 className={styles.cardTitle}>Primary Details</h6>
       <button className={styles.editBtn} onClick={() => handleEditClick("personal")}>
