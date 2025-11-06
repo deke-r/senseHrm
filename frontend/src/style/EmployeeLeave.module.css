@@ -452,3 +452,20 @@
     }
   }
   
+  .twoColumnRow {
+    display: flex;
+    gap: 20px;
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+  
+  .leftColumn {
+    flex: 1.2;
+    min-width: 350px;
+  }
+  
+  .rightColumn {
+    flex: 0.8;
+    min-width: 300px;
+  }
+  

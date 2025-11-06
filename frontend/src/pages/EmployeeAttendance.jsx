@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styles from "../style/EmployeeAttendance.module.css";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
@@ -8,33 +7,9 @@ import AttendanceActions from "../components/AttendanceActions";
 
 export default function EmployeeAttendance() {
   const [activeTab, setActiveTab] = useState("attendancelog");
-  const [showCanvas, setShowCanvas] = useState(false);
-  const [canvasType, setCanvasType] = useState("");
-  const [requests, setRequests] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
 
-  const openCanvas = (type) => {
-    setCanvasType(type);
-    setShowCanvas(true);
-  };
-
-  const closeCanvas = () => setShowCanvas(false);
-
-  const handleSubmitRequest = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const newReq = {
-      type: canvasType,
-      from: formData.get("from"),
-      to: formData.get("to"),
-      note: formData.get("note"),
-      date: new Date().toLocaleDateString(),
-    };
-    setRequests((prev) => [...prev, newReq]);
-    closeCanvas();
-  };
-
-  // Calendar days
+  // Calendar rendering
   const renderCalendar = () => {
     const year = selectedMonth.getFullYear();
     const month = selectedMonth.getMonth();
@@ -72,21 +47,8 @@ export default function EmployeeAttendance() {
   };
 
   const attendanceData = [
-    {
-      date: "Fri, 05 Sept",
-      status: "HLDY",
-      effective: "9h 14m",
-      gross: "9h 14m",
-      arrival: "",
-      log: "checkmark",
-    },
-    {
-      date: "Thu, 04 Sept",
-      effective: "5h 13m",
-      gross: "5h 13m",
-      arrival: "On Time",
-      log: "checkmark",
-    },
+    { date: "Fri, 05 Sept", effective: "9h 14m", gross: "9h 14m", arrival: "", log: "checkmark" },
+    { date: "Thu, 04 Sept", effective: "5h 13m", gross: "5h 13m", arrival: "On Time", log: "checkmark" },
   ];
 
   return (
@@ -95,7 +57,6 @@ export default function EmployeeAttendance() {
       <Sidebar />
       <main>
         <div className={styles.page}>
-          {/* Main Content */}
           <div className={styles.mainContent}>
             <div className={styles.topSection}>
               {/* Attendance Stats */}
@@ -166,11 +127,11 @@ export default function EmployeeAttendance() {
                 </div>
               </div>
 
-              {/* Reusable Actions Component */}
-              <AttendanceActions onOpenCanvas={openCanvas} />
+              {/* Actions Component (self-contained with canvas) */}
+              <AttendanceActions />
             </div>
 
-            {/* Logs & Requests */}
+            {/* Logs & Requests Section */}
             <div className={styles.card} style={{ marginTop: "24px" }}>
               <h6 className={styles.cardTitle}>Logs & Requests</h6>
 
@@ -193,13 +154,11 @@ export default function EmployeeAttendance() {
                 ))}
               </div>
 
-              {/* Attendance Log */}
               {activeTab === "attendancelog" && (
                 <table className={styles.dataTable}>
                   <thead>
                     <tr>
                       <th>DATE</th>
-                      <th>ATTENDANCE VISUAL</th>
                       <th>EFFECTIVE HOURS</th>
                       <th>GROSS HOURS</th>
                       <th>ARRIVAL</th>
@@ -210,9 +169,6 @@ export default function EmployeeAttendance() {
                     {attendanceData.map((row, idx) => (
                       <tr key={idx}>
                         <td>{row.date}</td>
-                        <td>
-                          {row.visual && <div className={styles.progressBar2}></div>}
-                        </td>
                         <td className={styles.hoursCell}>{row.effective}</td>
                         <td className={styles.hoursCell}>{row.gross}</td>
                         <td>{row.arrival}</td>
@@ -227,7 +183,6 @@ export default function EmployeeAttendance() {
                 </table>
               )}
 
-              {/* Calendar */}
               {activeTab === "calendar" && (
                 <div className={styles.calendarBox}>
                   <div className={styles.calendarHeader}>
@@ -278,111 +233,8 @@ export default function EmployeeAttendance() {
                   </table>
                 </div>
               )}
-
-              {/* Attendance Requests */}
-              {activeTab === "attendancerequests" && (
-                <div className={styles.requestList}>
-                  {requests.length === 0 ? (
-                    <p className="text-muted f_13">No requests yet.</p>
-                  ) : (
-                    requests.map((req, i) => (
-                      <div key={i} className={styles.requestItem}>
-                        <div>
-                          <strong>
-                            {req.type === "wfh"
-                              ? "Work From Home"
-                              : req.type === "leave"
-                              ? "Leave"
-                              : "Partial Day"}
-                          </strong>
-                          <p className="text-muted f_13">
-                            {req.from} → {req.to}
-                          </p>
-                          <p className="f_13">{req.note}</p>
-                        </div>
-                        <span className={styles.badgePending}>Pending</span>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
             </div>
           </div>
-
-          {/* Canvas */}
-          {showCanvas && (
-            <div className={styles.canvasOverlay}>
-              <div className={styles.canvas}>
-                <div className={styles.canvasHeader}>
-                  <h6>
-                    {canvasType === "wfh"
-                      ? "Request Work From Home"
-                      : canvasType === "partial"
-                      ? "Partial Day Request"
-                      : "Apply Leave"}
-                  </h6>
-                  <button onClick={closeCanvas} className={styles.closeBtn}>
-                    ✕
-                  </button>
-                </div>
-
-                <form className={styles.canvasBody} onSubmit={handleSubmitRequest}>
-                  <div className={styles.dateBox}>
-                    <div>
-                      <p className={styles.inputLabel}>From</p>
-                      <input
-                        name="from"
-                        type="date"
-                        className={styles.dateInput}
-                        required
-                      />
-                    </div>
-                    <div className={styles.dayCount}>0 days</div>
-                    <div>
-                      <p className={styles.inputLabel}>To</p>
-                      <input
-                        name="to"
-                        type="date"
-                        className={styles.dateInput}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className={styles.infoBox}>
-                    <i className="bi bi-info-circle"></i>
-                    {canvasType === "wfh"
-                      ? "As per the policy assigned, only Mon–Sat will be considered for WFH."
-                      : "Past-dated requests aren't allowed when clock-in is enabled."}
-                  </div>
-
-                  {canvasType === "partial" && (
-                    <div className={styles.formGroup}>
-                      <label className={styles.inputLabel}>Select Half</label>
-                      <select name="half" className={styles.input}>
-                        <option>First Half</option>
-                        <option>Second Half</option>
-                      </select>
-                    </div>
-                  )}
-
-                  <div className={styles.formGroup}>
-                    <label className={styles.inputLabel}>Note</label>
-                    <textarea
-                      name="note"
-                      placeholder="Type here"
-                      className={styles.textarea}
-                      required
-                    ></textarea>
-                  </div>
-
-                  <button type="submit" className={styles.submitBtn}>
-                    Submit Request
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
         </div>
       </main>
     </>
