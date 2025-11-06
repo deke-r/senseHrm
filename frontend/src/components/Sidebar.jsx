@@ -12,27 +12,23 @@ export default function Sidebar() {
     clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
       setHoveredMenu(label);
-    }, 150); // small delay to prevent flicker
+    }, 150);
   };
 
   const handleMouseLeave = () => {
     clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
       setHoveredMenu(null);
-    }, 200); // delay closing
+    }, 200);
   };
 
   const menuItems = [
-    {
-        icon: "bi-house",
-        label: "Home",
-        path: "/employee-dashboard",
-      },
+    { icon: "bi-house", label: "Home", path: "/employee-dashboard" },
     {
       icon: "bi-person",
       label: "Me",
       subItems: [
-        { label: "Attendance", path: "/me/attendance" },
+        { label: "Attendance", path: "/employee/attendance" },
         {
           label: "Timesheet",
           subItems: [
@@ -45,7 +41,7 @@ export default function Sidebar() {
             { label: "Projects Allocated", path: "/me/timesheet/projects" },
           ],
         },
-        { label: "Leave", path: "/me/leave" },
+        { label: "Leave", path: "/employee/leave" },
         { label: "Performance", path: "/me/performance" },
         {
           label: "Expenses & Travel",
@@ -65,8 +61,6 @@ export default function Sidebar() {
 
   return (
     <aside className={styles.sidebar}>
- 
-
       <nav className={styles.menu}>
         {menuItems.map((item) => (
           <div
@@ -75,16 +69,27 @@ export default function Sidebar() {
             onMouseEnter={() => handleMouseEnter(item.label)}
             onMouseLeave={handleMouseLeave}
           >
-            <div
-              className={`${styles.menuItem} ${
-                location.pathname === item.path ? styles.active : ""
-              }`}
-            >
-              <i className={`bi ${item.icon} ${styles.icon}`}></i>
-              <span className={`f_13 ${styles.label}`}>{item.label}</span>
-            </div>
+            {item.path ? (
+              <Link
+                to={item.path}
+                className={`${styles.menuItem} ${
+                  location.pathname === item.path ? styles.active : ""
+                }`}
+              >
+                <i className={`bi ${item.icon} ${styles.icon}`}></i>
+                <span className={`f_13 ${styles.label}`}>{item.label}</span>
+              </Link>
+            ) : (
+              <div
+                className={`${styles.menuItem} ${
+                  location.pathname === item.path ? styles.active : ""
+                }`}
+              >
+                <i className={`bi ${item.icon} ${styles.icon}`}></i>
+                <span className={`f_13 ${styles.label}`}>{item.label}</span>
+              </div>
+            )}
 
-            {/* Hover submenu */}
             {item.subItems && hoveredMenu === item.label && (
               <div
                 className={styles.submenu}

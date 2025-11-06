@@ -183,3 +183,21 @@
     margin-bottom: 12px;
   }
   
+
+
+  /* ------------------- leaves  */
+
+  .leaveTable {
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+  }
+  
+  .offcanvas {
+    width: 380px;
+    background-color: #fff;
+    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  /* ------------------- leaves  */

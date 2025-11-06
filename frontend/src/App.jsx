@@ -22,6 +22,9 @@ import WFH from "./pages/WFH"
 import Feed from "./pages/Feed"
 import Profile from "./pages/Profile"
 
+import EmployeeAttendance from "./pages/EmployeeAttendance"
+import LeavePage from "./pages/EmployeeLeave"
+
 export default function App() {
   const { isAuthenticated, loading, user } = useAuth()
 
@@ -102,6 +105,22 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/employee/attendance"
+          element={
+            <ProtectedRoute>
+              <EmployeeAttendance />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/employee/leave"
+          element={
+            <ProtectedRoute>
+              <LeavePage />
             </ProtectedRoute>
           }
         />

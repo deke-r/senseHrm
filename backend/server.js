@@ -5,6 +5,9 @@ import dotenv from "dotenv"
 import routes from "./routes/routes.js"
 import postsRouter from "./routes/posts.js";
 import profileRoutes from "./routes/profile.js";
+import leaveRoutes from "./routes/leave.js";
+import wfhRoutes from "./routes/wfh.js";
+import partialRoutes from "./routes/partial.js";
 import path from "path";
 
 import { fileURLToPath } from "url";
@@ -36,6 +39,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use("/api", routes)
 app.use("/api/posts", postsRouter);
 app.use("/api/profile", profileRoutes);
+app.use("/api/leave", leaveRoutes);
+app.use("/api/wfh", wfhRoutes);
+app.use("/api/partial", partialRoutes);
 
 // Health check
 app.get("/health", (req, res) => {
