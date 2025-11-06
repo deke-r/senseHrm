@@ -1,52 +1,77 @@
 import express from "express";
 import { verifyToken } from "../middleware/verifyToken.js";
 import pool from "../db/config.js";
+import { sendNotificationEmail } from "../utils/mailer.js";
 
 const router = express.Router();
 
-/* ✅ Apply for leave */
+// ✅ Helper: Format date as DD-MM-YYYY
+const formatDate = (dateStr) => {
+  if (!dateStr) return "-";
+  const d = new Date(dateStr);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
 router.post("/apply", verifyToken, async (req, res) => {
   try {
-    const { leave_type, half_day, from_date, to_date, total_days, reason } = req.body;
+    const { leave_category, leave_type, half_day, from_date, to_date, total_days, note } = req.body;
 
-    if (!from_date || !to_date || !reason)
+    if (!from_date || !to_date || !note)
       return res.status(400).json({ message: "All fields are required" });
 
+    const userId = req.user.id;
+
+    // ✅ Fetch user details from USERS table (not employees)
+    const [userRows] = await pool.query("SELECT name, email FROM users WHERE id = ?", [userId]);
+    if (!userRows.length) return res.status(404).json({ message: "User not found" });
+
+    const { name, email } = userRows[0];
+
+    // ✅ Insert Leave Record
     await pool.query(
       `INSERT INTO employee_leaves 
-      (user_id, leave_type, half_day, from_date, to_date, total_days, reason) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [req.user.id, leave_type, half_day || null, from_date, to_date, total_days, reason]
+       (user_id, leave_category, leave_type, half_day, from_date, to_date, total_days, note, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+      [userId, leave_category, leave_type, half_day || null, from_date, to_date, total_days, note]
     );
 
-    res.json({ success: true, message: "Leave applied successfully" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "Error applying for leave" });
-  }
-});
+    const hrEmail = "bhavishya.sense@gmail.com";
 
-/* ✅ Fetch all leave requests for the logged-in user */
-router.get("/", verifyToken, async (req, res) => {
-  try {
-    const [rows] = await pool.query(
-      "SELECT * FROM employee_leaves WHERE user_id = ? ORDER BY created_at DESC",
-      [req.user.id]
-    );
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Failed to fetch leave records" });
-  }
-});
+    // ✅ Email Summary
+    const summary = {
+      "Leave Type": leave_category,
+      "Duration": leave_type === "half" ? "Half Day" : "Full Day",
+      "From Date": formatDate(from_date),
+      "To Date": formatDate(to_date),
+      "Total Days": `${total_days} day(s)`,
+      "Note": note,
+    };
 
-/* ✅ HR/Admin can approve/reject (optional) */
-router.patch("/:id", verifyToken, async (req, res) => {
-  const { status } = req.body;
-  try {
-    await pool.query("UPDATE employee_leaves SET status = ? WHERE id = ?", [status, req.params.id]);
-    res.json({ success: true, message: "Leave status updated" });
+    // ✅ Email to Employee (confirmation)
+    await sendNotificationEmail({
+      to: email,
+      subject: "Leave Request Submitted Successfully",
+      heading: "Leave Request Confirmation",
+      message: `Hi <strong>${name}</strong>, your leave request has been submitted successfully.`,
+      summaryData: summary,
+    });
+
+    // ✅ Email to HR (notification)
+    await sendNotificationEmail({
+      to: hrEmail,
+      subject: `Employee Leave Request - ${name}`,
+      heading: `New Leave Request from ${name}`,
+      message: `A new leave request has been submitted by <strong>${name}</strong>.`,
+      summaryData: summary,
+    });
+
+    res.json({ success: true, message: "Leave applied and emails sent successfully" });
   } catch (err) {
-    res.status(500).json({ message: "Error updating leave status" });
+    console.error("❌ Leave apply error:", err);
+    res.status(500).json({ message: "Error applying for leave" });
   }
 });
 
