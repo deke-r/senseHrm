@@ -1,154 +1,234 @@
-"use client"
-import React from "react";
-
-import { useState, useEffect } from "react"
-import { useAuth } from "../hooks/useAuth"
-import { toast } from "react-toastify"
-import { Clock, LogIn, LogOut } from "lucide-react"
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+"use client";
+import React, { useState } from "react";
+import styles from "../style/Attendance.module.css";
+import Sidebar from "../components/Sidebar";
+import Navbar from "../components/Navbar";
+import AttendanceActions from "../components/AttendanceActions";
+import LeaveHistoryTable from "../components/LeaveHistoryTable";
+import TimingsSection from "../components/TimingsSection";
 
 export default function Attendance() {
-  const { token, user } = useAuth()
-  const [attendance, setAttendance] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [checkedIn, setCheckedIn] = useState(false)
+  const [activeTab, setActiveTab] = useState("attendancelog");
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
 
-  useEffect(() => {
-    fetchAttendance()
-  }, [])
+  const renderCalendar = () => {
+    const year = selectedMonth.getFullYear();
+    const month = selectedMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const startDay = firstDay.getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = new Date();
 
-  const fetchAttendance = async () => {
-    try {
-      const response = await fetch(`${API_URL}/attendance`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (!response.ok) throw new Error("Failed to fetch")
-      const data = await response.json()
-      setAttendance(data)
-
-      // Check if user checked in today
-      const today = new Date().toISOString().split("T")[0]
-      const todayRecord = data.find((a) => a.date === today && !a.check_out)
-      setCheckedIn(!!todayRecord)
-    } catch (error) {
-      toast.error("Failed to load attendance")
+    const weeks = [];
+    let day = 1;
+    for (let i = 0; i < 6; i++) {
+      const week = [];
+      for (let j = 0; j < 7; j++) {
+        if ((i === 0 && j < startDay) || day > daysInMonth) {
+          week.push(<td key={j}></td>);
+        } else {
+          const isToday =
+            today.getDate() === day &&
+            today.getMonth() === month &&
+            today.getFullYear() === year;
+          week.push(
+            <td
+              key={j}
+              className={`${styles.calendarDay} ${isToday ? styles.today : ""}`}
+            >
+              {day}
+            </td>
+          );
+          day++;
+        }
+      }
+      weeks.push(<tr key={i}>{week}</tr>);
     }
-  }
+    return weeks;
+  };
 
-  const handleCheckIn = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch(`${API_URL}/attendance`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ check_in: new Date() }),
-      })
-      if (!response.ok) throw new Error("Check-in failed")
-      toast.success("Checked in successfully")
-      setCheckedIn(true)
-      fetchAttendance()
-    } catch (error) {
-      toast.error(error.message)
-    }
-    setLoading(false)
-  }
-
-  const handleCheckOut = async () => {
-    setLoading(true)
-    try {
-      const response = await fetch(`${API_URL}/attendance`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ check_out: new Date() }),
-      })
-      if (!response.ok) throw new Error("Check-out failed")
-      toast.success("Checked out successfully")
-      setCheckedIn(false)
-      fetchAttendance()
-    } catch (error) {
-      toast.error(error.message)
-    }
-    setLoading(false)
-  }
-
-  const displayAttendance = user?.role === "employee" ? attendance.filter((a) => a.user_id === user.id) : attendance
+  const attendanceData = [
+    { date: "Fri, 05 Sept", effective: "9h 14m", gross: "9h 14m", arrival: "", log: "checkmark" },
+    { date: "Thu, 04 Sept", effective: "5h 13m", gross: "5h 13m", arrival: "On Time", log: "checkmark" },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="bg-purple-600 p-3 rounded-lg">
-            <Clock className="w-6 h-6 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900">Attendance Management</h1>
-        </div>
+    <>
+      <Navbar />
+      <Sidebar />
 
-        {user?.role === "employee" && (
-          <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-            <p className="text-gray-600 mb-4">Current Status: {checkedIn ? "Checked In" : "Not Checked In"}</p>
-            <div className="flex gap-4">
-              <button
-                onClick={handleCheckIn}
-                disabled={checkedIn || loading}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50"
-              >
-                <LogIn className="w-5 h-5" /> Check In
-              </button>
-              <button
-                onClick={handleCheckOut}
-                disabled={!checkedIn || loading}
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg flex items-center gap-2 disabled:opacity-50"
-              >
-                <LogOut className="w-5 h-5" /> Check Out
-              </button>
+      <main>
+        <div className={styles.page}>
+          <div className={styles.mainContent}>
+            {/* ===================== TOP SECTION ===================== */}
+            <div className={styles.topSection}>
+              {/* Attendance Stats */}
+              <div className={styles.card}>
+                <h6 className={styles.cardTitle}>Attendance Stats</h6>
+                <div className={styles.statsContainer}>
+                  <div className={styles.statItem}>
+                    <div className={styles.statRow}>
+                      <div
+                        className={`${styles.iconCircle} ${styles.iconYellow}`}
+                      >
+                        <i className="bi bi-person"></i>
+                      </div>
+                      <p className={styles.label}>Me</p>
+                    </div>
+                    <div className={styles.statsData}>
+                      <div>
+                        <p className={styles.dataLabel}>AVG HRS / DAY</p>
+                        <p className={styles.dataValue}>9h 3m</p>
+                      </div>
+                      <div>
+                        <p className={styles.dataLabel}>ON TIME ARRIVAL</p>
+                        <p className={styles.dataValue}>67%</p>
+                      </div>
+                    </div>
+                  </div>
+                  <hr className={styles.divider} />
+                  <div className={styles.statItem}>
+                    <div className={styles.statRow}>
+                      <div
+                        className={`${styles.iconCircle} ${styles.iconBlue}`}
+                      >
+                        <i className="bi bi-people"></i>
+                      </div>
+                      <p className={styles.label}>My Team</p>
+                    </div>
+                    <div className={styles.statsData}>
+                      <div>
+                        <p className={styles.dataLabel}>AVG HRS / DAY</p>
+                        <p className={styles.dataValue}>3h 42m</p>
+                      </div>
+                      <div>
+                        <p className={styles.dataLabel}>ON TIME ARRIVAL</p>
+                        <p className={styles.dataValue}>9%</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dynamic Timings Component */}
+              <TimingsSection />
+
+              {/* Attendance Actions */}
+              <AttendanceActions />
+            </div>
+
+            {/* ===================== LOGS & REQUESTS ===================== */}
+            <div className={styles.card} style={{ marginTop: "24px" }}>
+              <h6 className={styles.cardTitle}>Logs & Requests</h6>
+
+              <div className={styles.tabs}>
+                {["Attendance Log", "Calendar", "Leave / Attendance Requests"].map((tab) => (
+                  <button
+                    key={tab}
+                    className={`${styles.tab} ${
+                      activeTab === tab.toLowerCase().replace(/\s|\/+/g, "")
+                        ? styles.tabActive
+                        : ""
+                    }`}
+                    onClick={() =>
+                      setActiveTab(tab.toLowerCase().replace(/\s|\/+/g, ""))
+                    }
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+
+              {activeTab === "attendancelog" && (
+                <table className={styles.dataTable}>
+                  <thead>
+                    <tr>
+                      <th>DATE</th>
+                      <th>EFFECTIVE HOURS</th>
+                      <th>GROSS HOURS</th>
+                      <th>ARRIVAL</th>
+                      <th>LOG</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {attendanceData.map((row, idx) => (
+                      <tr key={idx}>
+                        <td>{row.date}</td>
+                        <td className={styles.hoursCell}>{row.effective}</td>
+                        <td className={styles.hoursCell}>{row.gross}</td>
+                        <td>{row.arrival}</td>
+                        <td>
+                          {row.log && (
+                            <i
+                              className="bi bi-check-circle-fill"
+                              style={{ color: "#5E9C76" }}
+                            ></i>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              {activeTab === "calendar" && (
+                <div className={styles.calendarBox}>
+                  <div className={styles.calendarHeader}>
+                    <button
+                      onClick={() =>
+                        setSelectedMonth(
+                          new Date(
+                            selectedMonth.getFullYear(),
+                            selectedMonth.getMonth() - 1,
+                            1
+                          )
+                        )
+                      }
+                    >
+                      ◀
+                    </button>
+                    <h6>
+                      {selectedMonth.toLocaleDateString("en-US", {
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </h6>
+                    <button
+                      onClick={() =>
+                        setSelectedMonth(
+                          new Date(
+                            selectedMonth.getFullYear(),
+                            selectedMonth.getMonth() + 1,
+                            1
+                          )
+                        )
+                      }
+                    >
+                      ▶
+                    </button>
+                  </div>
+                  <table className={styles.calendarTable}>
+                    <thead>
+                      <tr>
+                        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+                          <th key={d}>{d}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>{renderCalendar()}</tbody>
+                  </table>
+                </div>
+              )}
+
+              {activeTab === "leaveattendancerequests" && (
+                <div className={styles.leaveRequestTab}>
+                  <LeaveHistoryTable />
+                </div>
+              )}
             </div>
           </div>
-        )}
-
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-100 border-b border-gray-200">
-              <tr>
-                <th className="px-6 py-4 text-left font-semibold text-gray-900">Employee</th>
-                <th className="px-6 py-4 text-left font-semibold text-gray-900">Date</th>
-                <th className="px-6 py-4 text-left font-semibold text-gray-900">Check In</th>
-                <th className="px-6 py-4 text-left font-semibold text-gray-900">Check Out</th>
-                <th className="px-6 py-4 text-left font-semibold text-gray-900">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayAttendance.map((record) => (
-                <tr key={record.id} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="px-6 py-4 text-gray-900">Employee #{record.user_id}</td>
-                  <td className="px-6 py-4 text-gray-700">{record.date}</td>
-                  <td className="px-6 py-4 text-gray-700">
-                    {record.check_in ? new Date(record.check_in).toLocaleTimeString() : "-"}
-                  </td>
-                  <td className="px-6 py-4 text-gray-700">
-                    {record.check_out ? new Date(record.check_out).toLocaleTimeString() : "-"}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                        record.status === "present" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {record.status.charAt(0).toUpperCase() + record.status.slice(1)}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
-      </div>
-    </div>
-  )
+      </main>
+    </>
+  );
 }

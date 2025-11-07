@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import styles from "../style/EmployeeLeave.module.css";
+import styles from "../style/Leave.module.css";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import AttendanceActions from "../components/AttendanceActions";

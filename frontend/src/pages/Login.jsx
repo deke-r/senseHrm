@@ -22,11 +22,7 @@ export default function Login() {
     const result = await login(data.email, data.password)
     if (result.success) {
       setTimeout(() => {
-        if (result.user.role === "employee") {
-          navigate("/employee-dashboard");
-        } else {
-          navigate("/hr-dashboard");
-        }
+        navigate("/dashboard");
       }, 100);
     }
      else {

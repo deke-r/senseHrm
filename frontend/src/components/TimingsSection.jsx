@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import styles from "../style/EmployeeAttendance.module.css";
+import styles from "../style/Attendance.module.css";
 
 export default function TimingsSection() {
   const [currentTime, setCurrentTime] = useState(new Date());

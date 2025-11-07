@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import styles from "./Sidebar.module.css";
+import styles from "../style/Sidebar.module.css";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -23,12 +23,12 @@ export default function Sidebar() {
   };
 
   const menuItems = [
-    { icon: "bi-house", label: "Home", path: "/employee-dashboard" },
+    { icon: "bi-house", label: "Home", path: "/dashboard" },
     {
       icon: "bi-person",
       label: "Me",
       subItems: [
-        { label: "Attendance", path: "/employee/attendance" },
+        { label: "Attendance", path: "/attendance" },
         {
           label: "Timesheet",
           subItems: [
@@ -41,7 +41,7 @@ export default function Sidebar() {
             { label: "Projects Allocated", path: "/me/timesheet/projects" },
           ],
         },
-        { label: "Leave", path: "/employee/leave" },
+        { label: "Leave", path: "/leave" },
         { label: "Performance", path: "/me/performance" },
         {
           label: "Expenses & Travel",

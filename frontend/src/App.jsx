@@ -12,18 +12,15 @@ import ProtectedRoute from "./components/ProtectedRoute"
 import Login from "./pages/Login"
 import Signup from "./pages/Signup"
 import ForgotPassword from "./pages/ForgotPassword"
-import EmployeeDashboard from "./pages/EmployeeDashboard"
-import HRDashboard from "./pages/HRDashboard"
 import Employees from "./pages/Employees"
 import EmployeeProfile from "./pages/EmployeeProfile"
-import Leaves from "./pages/Leaves"
-import Attendance from "./pages/Attendance"
-import WFH from "./pages/WFH"
 import Feed from "./pages/Feed"
 import Profile from "./pages/Profile"
 
-import EmployeeAttendance from "./pages/EmployeeAttendance"
-import LeavePage from "./pages/EmployeeLeave"
+
+import LeavePage from "./pages/Leave"
+import Dashboard from "./pages/Dashboard"
+import Attendance from "./pages/Attendance"
 
 export default function App() {
   const { isAuthenticated, loading, user } = useAuth()
@@ -77,21 +74,14 @@ export default function App() {
 
         {/* Protected Routes - Role-based */}
         <Route
-          path="/employee-dashboard"
+          path="/dashboard"
           element={
             <ProtectedRoute requiredRole="employee">
-              <EmployeeDashboard />
+              <Dashboard />
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/hr-dashboard"
-          element={
-            <ProtectedRoute requiredRole={["hr", "admin"]}>
-              <HRDashboard />
-            </ProtectedRoute>
-          }
-        />
+
         <Route
           path="/employees"
           element={
@@ -109,15 +99,15 @@ export default function App() {
           }
         />
         <Route
-          path="/employee/attendance"
+          path="/attendance"
           element={
             <ProtectedRoute>
-              <EmployeeAttendance />
+              <Attendance />
             </ProtectedRoute>
           }
         />
         <Route
-          path="/employee/leave"
+          path="/leave"
           element={
             <ProtectedRoute>
               <LeavePage />
@@ -132,30 +122,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/leaves"
-          element={
-            <ProtectedRoute>
-              <Leaves />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/attendance"
-          element={
-            <ProtectedRoute>
-              <Attendance />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/wfh"
-          element={
-            <ProtectedRoute>
-              <WFH />
-            </ProtectedRoute>
-          }
-        />
+
         <Route
           path="/feed"
           element={

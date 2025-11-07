@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import styles from "../style/EmployeeAttendance.module.css";
+import styles from "../style/Attendance.module.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 

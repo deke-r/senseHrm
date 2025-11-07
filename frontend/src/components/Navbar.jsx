@@ -63,7 +63,6 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
   };
 
   return (
@@ -71,7 +70,7 @@ export default function Navbar() {
       {/* Left Brand Section */}
       <div className={styles.leftSection}>
         <div className={styles.brand}>
-          <Link to="/employee-dashboard" className="text-decoration-none">
+          <Link to="/dashboard" className="text-decoration-none">
             <span className={styles.brandText}>SENSE PROJECTS</span>
           </Link>
         </div>
