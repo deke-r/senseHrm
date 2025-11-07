@@ -5,6 +5,7 @@ import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import AttendanceActions from "../components/AttendanceActions";
 import LeaveHistoryTable from "../components/LeaveHistoryTable"; // ✅ New standalone component
+import PendingRequestsSection from "../components/PendingRequestsSection";
 
 export default function LeavePage() {
   return (
@@ -21,7 +22,7 @@ export default function LeavePage() {
 
               <div className={styles.twoColumnRow}>
                 {/* ====== Left: Pending Leave Requests ====== */}
-                <div className={`${styles.card} ${styles.leftColumn}`}>
+                {/* <div className={`${styles.card} ${styles.leftColumn}`}>
                   <div className={styles.pendingHeader}>
                     <h6 className={`${styles.sectionTitle} fw-semibold`}>
                       Pending leave requests
@@ -51,7 +52,11 @@ export default function LeavePage() {
                       </button>
                     </div>
                   </div>
-                </div>
+                </div> */}
+
+                {/* ====== Left: Pending Leave Requests ====== */}
+<PendingRequestsSection />
+
 
                 {/* ====== Right: Leave / WFH / Partial Request Actions ====== */}
                 <div className={`${styles.rightColumn}`}>
