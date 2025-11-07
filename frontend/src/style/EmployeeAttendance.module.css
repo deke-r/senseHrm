@@ -770,4 +770,17 @@
     border-radius: 4px;
     font-weight: 600;
   }
-  
+.dayCompleted {
+  background: #B5D4C0 !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.today {
+  background: #5E9C76 !important;
+  color: #fff !important;
+}
+
+.progressFill {
+  background: #5E9C76 !important;
+}

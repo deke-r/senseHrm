@@ -8,6 +8,7 @@ import profileRoutes from "./routes/profile.js";
 import leaveRoutes from "./routes/leave.js";
 import wfhRoutes from "./routes/wfh.js";
 import partialRoutes from "./routes/partial.js";
+import leaveHistoryRoutes from "./routes/leaveHistory.js";
 import path from "path";
 
 import { fileURLToPath } from "url";
@@ -42,6 +43,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/leave", leaveRoutes);
 app.use("/api/wfh", wfhRoutes);
 app.use("/api/partial", partialRoutes);
+app.use("/api/leave", leaveHistoryRoutes);
 
 // Health check
 app.get("/health", (req, res) => {

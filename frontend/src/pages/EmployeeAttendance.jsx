@@ -4,12 +4,13 @@ import styles from "../style/EmployeeAttendance.module.css";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import AttendanceActions from "../components/AttendanceActions";
+import LeaveHistoryTable from "../components/LeaveHistoryTable";
+import TimingsSection from "../components/TimingsSection";
 
 export default function EmployeeAttendance() {
   const [activeTab, setActiveTab] = useState("attendancelog");
   const [selectedMonth, setSelectedMonth] = useState(new Date());
 
-  // Calendar rendering
   const renderCalendar = () => {
     const year = selectedMonth.getFullYear();
     const month = selectedMonth.getMonth();
@@ -55,9 +56,11 @@ export default function EmployeeAttendance() {
     <>
       <Navbar />
       <Sidebar />
+
       <main>
         <div className={styles.page}>
           <div className={styles.mainContent}>
+            {/* ===================== TOP SECTION ===================== */}
             <div className={styles.topSection}>
               {/* Attendance Stats */}
               <div className={styles.card}>
@@ -65,7 +68,9 @@ export default function EmployeeAttendance() {
                 <div className={styles.statsContainer}>
                   <div className={styles.statItem}>
                     <div className={styles.statRow}>
-                      <div className={`${styles.iconCircle} ${styles.iconYellow}`}>
+                      <div
+                        className={`${styles.iconCircle} ${styles.iconYellow}`}
+                      >
                         <i className="bi bi-person"></i>
                       </div>
                       <p className={styles.label}>Me</p>
@@ -84,7 +89,9 @@ export default function EmployeeAttendance() {
                   <hr className={styles.divider} />
                   <div className={styles.statItem}>
                     <div className={styles.statRow}>
-                      <div className={`${styles.iconCircle} ${styles.iconBlue}`}>
+                      <div
+                        className={`${styles.iconCircle} ${styles.iconBlue}`}
+                      >
                         <i className="bi bi-people"></i>
                       </div>
                       <p className={styles.label}>My Team</p>
@@ -103,50 +110,28 @@ export default function EmployeeAttendance() {
                 </div>
               </div>
 
-              {/* Timings */}
-              <div className={styles.card}>
-                <h6 className={styles.cardTitle}>Timings</h6>
-                <div className={styles.daySelector}>
-                  {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
-                    <div
-                      key={i}
-                      className={`${styles.dayCircle} ${
-                        i === 5 ? styles.dayActive : ""
-                      }`}
-                    >
-                      {d}
-                    </div>
-                  ))}
-                </div>
-                <p className={styles.timeLabel}>Today (9:30 AM - 6:30 PM)</p>
-                <div className={styles.progressBar}>
-                  <div className={styles.progressFill}></div>
-                </div>
-                <div className={styles.durationBox}>
-                  <span>Duration: 9h 0m</span>
-                </div>
-              </div>
+              {/* Dynamic Timings Component */}
+              <TimingsSection />
 
-              {/* Actions Component (self-contained with canvas) */}
+              {/* Attendance Actions */}
               <AttendanceActions />
             </div>
 
-            {/* Logs & Requests Section */}
+            {/* ===================== LOGS & REQUESTS ===================== */}
             <div className={styles.card} style={{ marginTop: "24px" }}>
               <h6 className={styles.cardTitle}>Logs & Requests</h6>
 
-              {/* Tabs */}
               <div className={styles.tabs}>
-                {["Attendance Log", "Calendar", "Attendance Requests"].map((tab) => (
+                {["Attendance Log", "Calendar", "Leave / Attendance Requests"].map((tab) => (
                   <button
                     key={tab}
                     className={`${styles.tab} ${
-                      activeTab === tab.toLowerCase().replace(/\s+/g, "")
+                      activeTab === tab.toLowerCase().replace(/\s|\/+/g, "")
                         ? styles.tabActive
                         : ""
                     }`}
                     onClick={() =>
-                      setActiveTab(tab.toLowerCase().replace(/\s+/g, ""))
+                      setActiveTab(tab.toLowerCase().replace(/\s|\/+/g, ""))
                     }
                   >
                     {tab}
@@ -174,7 +159,10 @@ export default function EmployeeAttendance() {
                         <td>{row.arrival}</td>
                         <td>
                           {row.log && (
-                            <i className="bi bi-check-circle-fill text-success"></i>
+                            <i
+                              className="bi bi-check-circle-fill"
+                              style={{ color: "#5E9C76" }}
+                            ></i>
                           )}
                         </td>
                       </tr>
@@ -222,15 +210,19 @@ export default function EmployeeAttendance() {
                   <table className={styles.calendarTable}>
                     <thead>
                       <tr>
-                        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
-                          (d) => (
-                            <th key={d}>{d}</th>
-                          )
-                        )}
+                        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+                          <th key={d}>{d}</th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody>{renderCalendar()}</tbody>
                   </table>
+                </div>
+              )}
+
+              {activeTab === "leaveattendancerequests" && (
+                <div className={styles.leaveRequestTab}>
+                  <LeaveHistoryTable />
                 </div>
               )}
             </div>
