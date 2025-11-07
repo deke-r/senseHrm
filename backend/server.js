@@ -10,6 +10,7 @@ import wfhRoutes from "./routes/wfh.js";
 import partialRoutes from "./routes/partial.js";
 import leaveHistoryRoutes from "./routes/leaveHistory.js";
 import path from "path";
+import manageRoutes from './routes/manage.js';
 
 import { fileURLToPath } from "url";
 
@@ -44,6 +45,7 @@ app.use("/api/leave", leaveRoutes);
 app.use("/api/wfh", wfhRoutes);
 app.use("/api/partial", partialRoutes);
 app.use("/api/leave", leaveHistoryRoutes);
+app.use("/api/manage", manageRoutes);
 
 // Health check
 app.get("/health", (req, res) => {

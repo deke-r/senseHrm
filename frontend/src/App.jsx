@@ -1,29 +1,27 @@
-"use client"
-import React from "react"
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
-import { ToastContainer } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
+"use client";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-import { useAuth } from "./hooks/useAuth"
-import Navbar from "./components/Navbar"
-import ProtectedRoute from "./components/ProtectedRoute"
+import { useAuth } from "./hooks/useAuth";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Pages
-import Login from "./pages/Login"
-import Signup from "./pages/Signup"
-import ForgotPassword from "./pages/ForgotPassword"
-import Employees from "./pages/Employees"
-import EmployeeProfile from "./pages/EmployeeProfile"
-import Feed from "./pages/Feed"
-import Profile from "./pages/Profile"
-
-
-import LeavePage from "./pages/Leave"
-import Dashboard from "./pages/Dashboard"
-import Attendance from "./pages/Attendance"
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import Employees from "./pages/Employees";
+import EmployeeProfile from "./pages/EmployeeProfile";
+import Feed from "./pages/Feed";
+import Profile from "./pages/Profile";
+import LeavePage from "./pages/Leave";
+import Dashboard from "./pages/Dashboard";
+import Attendance from "./pages/Attendance";
+import ManageRequests from "./pages/admin/ManageRequests";
 
 export default function App() {
-  const { isAuthenticated, loading, user } = useAuth()
+  const { isAuthenticated, loading, user } = useAuth();
 
   if (loading) {
     return (
@@ -32,51 +30,54 @@ export default function App() {
           <span className="visually-hidden">Loading...</span>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <Router>
+      {/* ✅ Global Toast Notifications */}
       <ToastContainer position="top-right" autoClose={3000} theme="light" />
-   
+
       <Routes>
- 
+        {/* ====== Public Routes ====== */}
         <Route
           path="/login"
           element={
             !isAuthenticated ? (
               <Login />
             ) : (
-              <Navigate to={user?.role === "employee" ? "/employee-dashboard" : "/hr-dashboard"} />
+              <Navigate to="/dashboard" />
             )
           }
         />
+
         <Route
           path="/signup"
           element={
             !isAuthenticated ? (
               <Signup />
             ) : (
-              <Navigate to={user?.role === "employee" ? "/employee-dashboard" : "/hr-dashboard"} />
+              <Navigate to="/dashboard" />
             )
           }
         />
+
         <Route
           path="/forgot-password"
           element={
             !isAuthenticated ? (
               <ForgotPassword />
             ) : (
-              <Navigate to={user?.role === "employee" ? "/employee-dashboard" : "/hr-dashboard"} />
+              <Navigate to="/dashboard" />
             )
           }
         />
 
-        {/* Protected Routes - Role-based */}
+        {/* ====== Protected Routes ====== */}
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute requiredRole="employee">
+            <ProtectedRoute>
               <Dashboard />
             </ProtectedRoute>
           }
@@ -90,14 +91,16 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
-          path="/profile"
+          path="/employees/:id"
           element={
             <ProtectedRoute>
-              <Profile />
+              <EmployeeProfile />
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/attendance"
           element={
@@ -106,6 +109,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/leave"
           element={
@@ -114,11 +118,12 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
-          path="/employees/:id"
+          path="/profile"
           element={
             <ProtectedRoute>
-              <EmployeeProfile />
+              <Profile />
             </ProtectedRoute>
           }
         />
@@ -132,16 +137,31 @@ export default function App() {
           }
         />
 
-        {/* Default Route */}
+
+        <Route
+          path="/manage/requests"
+          element={
+            <ProtectedRoute requiredRole={["hr", "admin"]}>
+              <ManageRequests />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ====== Default Route ====== */}
         <Route
           path="/"
           element={
-            <Navigate
-              to={isAuthenticated ? (user?.role === "employee" ? "/employee-dashboard" : "/hr-dashboard") : "/login"}
-            />
+            isAuthenticated ? (
+              <Navigate to="/dashboard" />
+            ) : (
+              <Navigate to="/login" />
+            )
           }
         />
+
+
+        <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
     </Router>
-  )
+  );
 }

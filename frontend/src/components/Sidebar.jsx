@@ -1,28 +1,26 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styles from "../style/Sidebar.module.css";
 
 export default function Sidebar() {
   const location = useLocation();
   const [hoveredMenu, setHoveredMenu] = useState(null);
+  const [userRole, setUserRole] = useState("employee"); // default fallback
   const timeoutRef = useRef(null);
 
-  const handleMouseEnter = (label) => {
-    clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      setHoveredMenu(label);
-    }, 150);
-  };
+  // ✅ Get user role from localStorage or context
+  useEffect(() => {
+    try {
+      const userData = JSON.parse(localStorage.getItem("user"));
+      if (userData?.role) setUserRole(userData.role);
+    } catch (err) {
+      console.error("❌ Failed to parse user data:", err);
+    }
+  }, []);
 
-  const handleMouseLeave = () => {
-    clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => {
-      setHoveredMenu(null);
-    }, 200);
-  };
-
-  const menuItems = [
+  // 🧭 Shared Employee Menu
+  const baseMenuItems = [
     { icon: "bi-house", label: "Home", path: "/dashboard" },
     {
       icon: "bi-person",
@@ -59,6 +57,52 @@ export default function Sidebar() {
     { icon: "bi-gear", label: "Settings", path: "/settings" },
   ];
 
+  // 🧠 Additional HR/Admin Menu Items
+  const hrMenuItems = [
+    {
+      icon: "bi-clipboard-check",
+      label: "Manage",
+      subItems: [
+        { label: "Review Requests", path: "/manage/requests" },
+        { label: "Employee Reports", path: "/reports" },
+        { label: "Manage Employees", path: "/employees" },
+        { label: "Department Overview", path: "/departments" },
+      ],
+    },
+  ];
+
+  // 🧠 Optional: Admin-Specific Items (if different from HR)
+  const adminMenuItems = [
+    {
+      icon: "bi-shield-lock",
+      label: "Admin Panel",
+      subItems: [
+        { label: "System Settings", path: "/admin/settings" },
+        { label: "Access Control", path: "/admin/roles" },
+        { label: "Audit Logs", path: "/admin/logs" },
+      ],
+    },
+  ];
+
+  // ✅ Merge Menus Based on Role
+  let menuItems = [...baseMenuItems];
+  if (userRole === "hr") menuItems = [...baseMenuItems, ...hrMenuItems];
+  if (userRole === "admin") menuItems = [...baseMenuItems, ...hrMenuItems, ...adminMenuItems];
+
+  const handleMouseEnter = (label) => {
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setHoveredMenu(label);
+    }, 150);
+  };
+
+  const handleMouseLeave = () => {
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setHoveredMenu(null);
+    }, 200);
+  };
+
   return (
     <aside className={styles.sidebar}>
       <nav className={styles.menu}>
@@ -77,7 +121,9 @@ export default function Sidebar() {
                 }`}
               >
                 <i className={`bi ${item.icon} ${styles.icon}`}></i>
-                <span className={`f_13 ${styles.label}`}>{item.label}</span>
+                <span className={`f_13 fw-semibold ${styles.label}`}>
+                  {item.label}
+                </span>
               </Link>
             ) : (
               <div
@@ -86,7 +132,9 @@ export default function Sidebar() {
                 }`}
               >
                 <i className={`bi ${item.icon} ${styles.icon}`}></i>
-                <span className={`f_13 ${styles.label}`}>{item.label}</span>
+                <span className={`f_13 fw-semibold ${styles.label}`}>
+                  {item.label}
+                </span>
               </div>
             )}
 
