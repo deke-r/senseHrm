@@ -105,8 +105,8 @@ export default function Navbar() {
               onMouseLeave={handleMouseLeave}
             >
               <div className={`pt-3 ${styles.userInfo}`}>
-                <strong>{userData.name || "John Doe"}</strong>
-                <small>{userData.designation || "Software Engineer"}</small>
+                <strong>{userData.name || ""}</strong>
+                <small>{userData.designation || ""}</small>
               </div>
               {/* <hr className={styles.dropdownDivider} /> */}
               <Link to="/profile" className={styles.dropdownItem}>
