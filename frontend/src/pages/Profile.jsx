@@ -197,7 +197,7 @@ export default function ProfilePage() {
             <div className={styles.contactItem}>📞 {user.phone || "N/A"}</div>
             <div className={styles.contactItem}>🏢 {user.head_office || "N/A"}</div>
             <div className={styles.contactItem}>
-              🆔 {user.emp_id}
+              🆔 {user.id}
               <button
                 className="btn btn-sm border-0 f_13 fw-semibold text-primary ms-2"
                 data-bs-toggle="offcanvas"
@@ -218,9 +218,9 @@ export default function ProfilePage() {
               <span className={styles.deptLabel}>REPORTING MANAGER</span>
               <div className={styles.managerBox}>
                 <div className={styles.managerAvatar}>
-                  {user.reporting_manager?.slice(0, 2).toUpperCase() || "RM"}
+                  {user.reporting_manager_name?.slice(0, 2).toUpperCase() || "RM"}
                 </div>
-                <span>{user.reporting_manager || "N/A"}</span>
+                <span>{user.reporting_manager_name || "N/A"}</span>
               </div>
             </div>
           </div>
@@ -330,7 +330,7 @@ export default function ProfilePage() {
 
             <div style={{ padding: "15px 25px", textAlign: "left" }}>
               {[
-                ["Employee Number", user.emp_id],
+                ["Employee Number", user.id],
                 ["Department", user.department],
                 ["Phone", user.phone],
                 ["Email", user.email],
