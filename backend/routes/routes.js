@@ -66,41 +66,39 @@ router.post("/auth/signup", async (req, res) => {
 router.post("/auth/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log("🟢 Login attempt with:", email, password);
+    console.log("🟢 Login attempt with:", email);
 
     const conn = await pool.getConnection();
     const [users] = await conn.execute("SELECT * FROM users WHERE email = ?", [email]);
     conn.release();
 
-    console.log("🔍 Query result:", users);
-
     if (users.length === 0) {
-      console.log("❌ No user found for email:", email);
+      // 🟥 No user found — generic error
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
     const user = users[0];
-    console.log("🧠 Found user:", user);
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log("🔑 Password valid?", isPasswordValid);
-
-    if (!isPasswordValid) {
-      console.log("❌ Password mismatch");
+    // 🚫 Check inactive user
+    if (user.status && user.status.toLowerCase() === "inactive") {
+      console.log("⚠️ Inactive user attempted login:", user.email);
+      // 🟥 Same response as wrong password
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    if (!process.env.JWT_SECRET) {
-      console.log("⚠️ Missing JWT_SECRET in .env");
+    // 🔑 Validate password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      // 🟥 Generic invalid message
+      return res.status(401).json({ error: "Invalid credentials" });
     }
 
+    // ✅ Generate JWT token
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
-
-    console.log("✅ Login successful:", user.email);
 
     res.json({
       token,
@@ -113,40 +111,58 @@ router.post("/auth/login", async (req, res) => {
     });
   } catch (error) {
     console.error("💥 Login Error:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Something went wrong. Please try again later." });
   }
 });
 
 
+
+
+// Forgot Password - Send OTP
 // Forgot Password - Send OTP
 router.post("/auth/forgot-password", async (req, res) => {
   try {
-    const { email } = req.body
-    const otp = Math.floor(100000 + Math.random() * 900000).toString()
-    const otp_expiry = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
+    const { email } = req.body;
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp_expiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    const conn = await pool.getConnection()
-    const [users] = await conn.execute("SELECT * FROM users WHERE email = ?", [email])
+    const conn = await pool.getConnection();
+    const [users] = await conn.execute("SELECT * FROM users WHERE email = ?", [email]);
 
     if (users.length === 0) {
-      conn.release()
-      return res.status(404).json({ error: "User not found" })
+      conn.release();
+      return res.status(404).json({ error: "User not found" });
     }
 
-    await conn.execute("UPDATE users SET otp = ?, otp_expiry = ? WHERE email = ?", [otp, otp_expiry, email])
-    conn.release()
+    const user = users[0];
+
+    // 🚫 Check inactive user
+    if (user.status && user.status.toLowerCase() === "inactive") {
+      conn.release();
+      console.log("⚠️ Inactive user attempted password reset:", user.email);
+      return res.status(403).json({
+        error: "Your account is inactive. Please contact the administrator.",
+      });
+    }
+
+    await conn.execute(
+      "UPDATE users SET otp = ?, otp_expiry = ? WHERE email = ?",
+      [otp, otp_expiry, email]
+    );
+    conn.release();
 
     await transporter.sendMail({
       to: email,
       subject: "Password Reset OTP",
       text: `Your OTP for password reset is: ${otp}. It will expire in 10 minutes.`,
-    })
+    });
 
-    res.json({ message: "OTP sent to your email" })
+    res.json({ message: "OTP sent to your email" });
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message });
   }
-})
+});
+
 
 // Verify OTP and Reset Password
 router.post("/auth/verify-otp", async (req, res) => {

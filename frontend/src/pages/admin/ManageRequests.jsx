@@ -21,7 +21,6 @@ export default function ManageRequests() {
     register,
     handleSubmit,
     reset,
-    watch,
     formState: { errors },
   } = useForm();
 
@@ -162,7 +161,8 @@ export default function ManageRequests() {
                   <tr>
                     <th>EMPLOYEE</th>
                     <th>TYPE</th>
-                    <th>DATE</th>
+                    <th>PERIOD</th>
+                    <th>APPLIED ON</th>
                     <th>STATUS</th>
                     <th>NOTE</th>
                     <th>ACTION</th>
@@ -174,7 +174,8 @@ export default function ManageRequests() {
                       <tr key={`${r.category}-${r.id}`}>
                         <td>{r.employee_name}</td>
                         <td>{r.type}</td>
-                        <td>{r.date}</td>
+                        <td>{r.duration}</td>
+                        <td>{r.applied_on}</td>
                         <td>
                           <span
                             className={`${styles.statusLabel} ${
@@ -208,7 +209,7 @@ export default function ManageRequests() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="6" className={styles.emptyRow}>
+                      <td colSpan="7" className={styles.emptyRow}>
                         No records found.
                       </td>
                     </tr>
@@ -279,7 +280,9 @@ export default function ManageRequests() {
                 <br />
                 <strong>Type:</strong> {selected.type}
                 <br />
-                <strong>Date:</strong> {selected.date}
+                <strong>Period:</strong> {selected.duration}
+                <br />
+                <strong>Applied On:</strong> {selected.applied_on}
                 <br />
                 <strong>Note:</strong> {selected.note || "—"}
               </div>

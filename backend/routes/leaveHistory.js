@@ -21,18 +21,20 @@ router.get("/history", verifyToken, async (req, res) => {
   try {
     const userId = req.user.id;
 
+    // 🟢 LEAVE REQUESTS
     const [leaves] = await pool.query(
       `SELECT 
         'Leave' AS category,
         id,
-        CONCAT(DATE_FORMAT(from_date, '%d %b %Y'),
+        CONCAT(
+          DATE_FORMAT(from_date, '%d %b %Y'),
           IF(from_date != to_date, CONCAT(' - ', DATE_FORMAT(to_date, '%d %b %Y')), ''),
           IF(half_day IS NOT NULL, CONCAT(' (', half_day, ')'), '')
         ) AS date,
         leave_category AS type,
         status,
         note,
-        created_at AS actionOn,
+        DATE_FORMAT(created_at, '%d %b %Y %h:%i %p') AS applied_on,
         'Self' AS requestedBy,
         cancel_reason AS reason
        FROM employee_leaves
@@ -41,17 +43,19 @@ router.get("/history", verifyToken, async (req, res) => {
       [userId]
     );
 
+    // 🟢 WFH REQUESTS
     const [wfh] = await pool.query(
       `SELECT 
         'Work From Home' AS category,
         id,
-        CONCAT(DATE_FORMAT(from_date, '%d %b %Y'),
+        CONCAT(
+          DATE_FORMAT(from_date, '%d %b %Y'),
           IF(from_date != to_date, CONCAT(' - ', DATE_FORMAT(to_date, '%d %b %Y')), '')
         ) AS date,
         'WFH Request' AS type,
         status,
         note,
-        created_at AS actionOn,
+        DATE_FORMAT(created_at, '%d %b %Y %h:%i %p') AS applied_on,
         'Self' AS requestedBy,
         cancel_reason AS reason
        FROM wfh_requests
@@ -60,6 +64,7 @@ router.get("/history", verifyToken, async (req, res) => {
       [userId]
     );
 
+    // 🟢 PARTIAL DAY REQUESTS
     const [partial] = await pool.query(
       `SELECT 
         'Partial Day' AS category,
@@ -68,7 +73,7 @@ router.get("/history", verifyToken, async (req, res) => {
         CONCAT('Partial Day (', half, ')') AS type,
         status,
         note,
-        created_at AS actionOn,
+        DATE_FORMAT(created_at, '%d %b %Y %h:%i %p') AS applied_on,
         'Self' AS requestedBy,
         cancel_reason AS reason
        FROM partial_day_requests
@@ -77,8 +82,9 @@ router.get("/history", verifyToken, async (req, res) => {
       [userId]
     );
 
+    // Combine & sort
     const combined = [...leaves, ...wfh, ...partial].sort(
-      (a, b) => new Date(b.actionOn) - new Date(a.actionOn)
+      (a, b) => new Date(b.applied_on) - new Date(a.applied_on)
     );
 
     res.json(combined);
@@ -87,6 +93,7 @@ router.get("/history", verifyToken, async (req, res) => {
     res.status(500).json({ message: "Failed to fetch leave history" });
   }
 });
+
 
 // ✅ Cancel request
 router.post("/cancel", verifyToken, async (req, res) => {

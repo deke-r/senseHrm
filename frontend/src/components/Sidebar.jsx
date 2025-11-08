@@ -65,8 +65,8 @@ export default function Sidebar() {
       subItems: [
         { label: "Review Requests", path: "/manage/requests" },
         { label: "Employee Reports", path: "/reports" },
-        { label: "Manage Employees", path: "/employees" },
-        { label: "Department Overview", path: "/departments" },
+        { label: "Manage Employees", path: "/manage/employee" },
+        { label: "Department Overview", path: "/manage/departments" },
       ],
     },
   ];

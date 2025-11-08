@@ -151,7 +151,7 @@ export default function LeaveHistoryTable() {
               <th>TYPE</th>
               <th>STATUS</th>
               <th>REQUESTED BY</th>
-              <th>ACTION TAKEN ON</th>
+              <th>APPLIED ON</th>
               <th>LEAVE NOTE</th>
               <th>REJECT/CANCELLATION REASON</th>
               <th>ACTIONS</th>
@@ -184,7 +184,7 @@ export default function LeaveHistoryTable() {
                     </div>
                   </td>
                   <td>{row.requestedBy}</td>
-                  <td>{new Date(row.actionOn).toLocaleDateString("en-GB")}</td>
+                  <td>{row.applied_on || "-"}</td>
                   <td className={styles.noteCell}>{row.note}</td>
                   <td>{row.reason || "-"}</td>
                   <td className={styles.actionsCell}>

@@ -19,6 +19,8 @@ import LeavePage from "./pages/Leave";
 import Dashboard from "./pages/Dashboard";
 import Attendance from "./pages/Attendance";
 import ManageRequests from "./pages/admin/ManageRequests";
+import ManageEmployees from "./pages/admin/ManageEmployees";
+import ManageDepartments from "./pages/admin/ManageDepartments";
 
 export default function App() {
   const { isAuthenticated, loading, user } = useAuth();
@@ -143,6 +145,22 @@ export default function App() {
           element={
             <ProtectedRoute requiredRole={["hr", "admin"]}>
               <ManageRequests />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manage/employee"
+          element={
+            <ProtectedRoute requiredRole={["hr", "admin"]}>
+              <ManageEmployees />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manage/departments"
+          element={
+            <ProtectedRoute requiredRole={["hr", "admin"]}>
+              <ManageDepartments />
             </ProtectedRoute>
           }
         />

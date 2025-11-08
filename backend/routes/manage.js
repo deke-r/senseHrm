@@ -5,29 +5,44 @@ import { sendNotificationEmail } from "../utils/mailer.js";
 
 const router = express.Router();
 
-// ✅ Fetch all requests (Leave + WFH + Partial)
+/* ==============================================
+   ✅ Fetch all requests (Leave + WFH + Partial)
+================================================= */
 router.get("/requests", verifyToken, async (req, res) => {
   try {
     const [rows] = await pool.query(`
       SELECT 'Leave' AS category, id, user_id, leave_category AS type,
-             CONCAT(DATE_FORMAT(from_date, '%d %b %Y'), 
-                    IF(from_date != to_date, CONCAT(' - ', DATE_FORMAT(to_date, '%d %b %Y')), '')
-             ) AS date,
-             note, status, created_at, cancel_reason AS reason
+             CONCAT(
+               DATE_FORMAT(from_date, '%d %b %Y'),
+               IF(from_date != to_date, CONCAT(' - ', DATE_FORMAT(to_date, '%d %b %Y')), '')
+             ) AS duration,
+             note, status,
+             DATE_FORMAT(created_at, '%d %b %Y %h:%i %p') AS applied_on,
+             cancel_reason AS reason
       FROM employee_leaves
+
       UNION ALL
-      SELECT 'Work From Home', id, user_id, 'WFH Request',
-             CONCAT(DATE_FORMAT(from_date, '%d %b %Y'), 
-                    IF(from_date != to_date, CONCAT(' - ', DATE_FORMAT(to_date, '%d %b %Y')), '')
-             ),
-             note, status, created_at, cancel_reason
+
+      SELECT 'Work From Home', id, user_id, 'WFH Request' AS type,
+             CONCAT(
+               DATE_FORMAT(from_date, '%d %b %Y'),
+               IF(from_date != to_date, CONCAT(' - ', DATE_FORMAT(to_date, '%d %b %Y')), '')
+             ) AS duration,
+             note, status,
+             DATE_FORMAT(created_at, '%d %b %Y %h:%i %p') AS applied_on,
+             cancel_reason AS reason
       FROM wfh_requests
+
       UNION ALL
-      SELECT 'Partial Day', id, user_id, CONCAT('Partial Day (', half, ')'),
-             DATE_FORMAT(request_date, '%d %b %Y'),
-             note, status, created_at, cancel_reason
+
+      SELECT 'Partial Day', id, user_id, CONCAT('Partial Day (', half, ')') AS type,
+             DATE_FORMAT(request_date, '%d %b %Y') AS duration,
+             note, status,
+             DATE_FORMAT(created_at, '%d %b %Y %h:%i %p') AS applied_on,
+             cancel_reason AS reason
       FROM partial_day_requests
-      ORDER BY created_at DESC
+
+      ORDER BY applied_on DESC
     `);
 
     const userIds = rows.map((r) => r.user_id);
@@ -50,7 +65,9 @@ router.get("/requests", verifyToken, async (req, res) => {
   }
 });
 
-// ✅ Update request status (approve/reject)
+/* ==============================================
+   ✅ Update request status (approve/reject)
+================================================= */
 router.post("/update-status", verifyToken, async (req, res) => {
   try {
     const { id, type, status, reason } = req.body;
@@ -65,7 +82,10 @@ router.post("/update-status", verifyToken, async (req, res) => {
     else if (type === "Partial Day") table = "partial_day_requests";
     else return res.status(400).json({ message: "Invalid type" });
 
-    await pool.query(`UPDATE ${table} SET status = ?, cancel_reason = ? WHERE id = ?`, [status, reason, id]);
+    await pool.query(
+      `UPDATE ${table} SET status = ?, cancel_reason = ? WHERE id = ?`,
+      [status, reason, id]
+    );
 
     // Get user email
     const [userData] = await pool.query(
@@ -76,9 +96,9 @@ router.post("/update-status", verifyToken, async (req, res) => {
     const hrEmail = "hr@senseprojects.in";
 
     const summary = {
-      "Type": type,
-      "Status": status.charAt(0).toUpperCase() + status.slice(1),
-      "Reason": reason || "—",
+      Type: type,
+      Status: status.charAt(0).toUpperCase() + status.slice(1),
+      Reason: reason || "—",
     };
 
     await sendNotificationEmail({

@@ -42,22 +42,40 @@ export const useAuth = () => {
 
   const login = async (email, password) => {
     try {
+      const controller = new AbortController();
+      const { signal } = controller;
+  
       const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-      })
-      if (!response.ok) throw new Error("Login failed")
-      const data = await response.json()
-      localStorage.setItem("token", data.token)
-      localStorage.setItem("user", JSON.stringify(data.user))
-      setToken(data.token)
-      setUser(data.user)
-      return { success: true, user: data.user }
-    } catch (error) {
-      return { success: false, error: error.message }
+        signal,
+      });
+  
+
+      if (!response.ok) {
+
+        await response.text().catch(() => null);
+        return { success: false, error: "Invalid credentials" };
+      }
+  
+      const data = await response.json().catch(() => null);
+      if (!data || !data.token) {
+        return { success: false, error: "Invalid response from server" };
+      }
+  
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setToken(data.token);
+      setUser(data.user);
+  
+      return { success: true, user: data.user };
+    } catch {
+      return { success: false, error: "Unable to connect to the server" };
     }
-  }
+  };
+  
+  
 
   const forgotPassword = async (email) => {
     try {

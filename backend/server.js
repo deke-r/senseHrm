@@ -11,6 +11,8 @@ import partialRoutes from "./routes/partial.js";
 import leaveHistoryRoutes from "./routes/leaveHistory.js";
 import path from "path";
 import manageRoutes from './routes/manage.js';
+import manageEmployeeRoutes from "./routes/manageEmployees.js";
+import departmentRoutes from "./routes/departments.js";
 
 import { fileURLToPath } from "url";
 
@@ -46,6 +48,9 @@ app.use("/api/wfh", wfhRoutes);
 app.use("/api/partial", partialRoutes);
 app.use("/api/leave", leaveHistoryRoutes);
 app.use("/api/manage", manageRoutes);
+app.use("/api/manage/employees", manageEmployeeRoutes);
+app.use("/api/departments", departmentRoutes);
+
 
 // Health check
 app.get("/health", (req, res) => {
