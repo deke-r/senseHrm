@@ -52,7 +52,7 @@ export default function Sidebar() {
       ],
     },
     { icon: "bi-inbox", label: "Inbox", path: "/inbox" },
-    { icon: "bi-people", label: "My Team", path: "/my-team" },
+    { icon: "bi-people", label: "My Team", path: "/teams" },
     { icon: "bi-cash-stack", label: "Finances", path: "/finances" },
     { icon: "bi-gear", label: "Settings", path: "/settings" },
   ];
