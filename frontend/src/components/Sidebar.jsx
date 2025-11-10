@@ -48,7 +48,7 @@ export default function Sidebar() {
             { label: "Travel Requests", path: "/me/travel" },
           ],
         },
-        { label: "Apps", path: "/me/apps" },
+        // { label: "Apps", path: "/me/apps" },
       ],
     },
     { icon: "bi-inbox", label: "Inbox", path: "/inbox" },

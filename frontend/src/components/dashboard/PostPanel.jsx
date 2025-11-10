@@ -1,13 +1,12 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import styles from "../../style/DashboardSections.module.css";
 
-
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
-export default function PostPanel() {
+export default function PostPanel({ onPostCreated }) {
   const [activeTab, setActiveTab] = useState("post");
   const [content, setContent] = useState("");
   const [users, setUsers] = useState([]);
@@ -62,22 +61,14 @@ export default function PostPanel() {
   };
 
   const handleSubmit = async () => {
-    if (!content.trim()) return toast.warning("Post cannot be empty");
-
     const formData = new FormData();
     formData.append("type", activeTab);
     formData.append("content", content);
     formData.append("mentions", JSON.stringify(mentions));
     if (image) formData.append("image", image);
 
-      // ✅ ADD LOGGING
-  console.log("=== SUBMITTING POST ===");
-  console.log("Has image:", !!image);
-  console.log("Content:", content);
-  console.log("Mentions:", mentions);
-
     try {
-      await axios.post(`${API_URL}/posts/post`, formData, {
+      const res = await axios.post(`${API_URL}/posts/post`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -87,18 +78,27 @@ export default function PostPanel() {
       setMentions([]);
       setImage(null);
       setPreview(null);
-    }catch (err) {
-        console.error("=== ERROR ===");
-    console.error("Full error:", err);
-    console.error("Response:", err.response?.data);
-    console.error("Status:", err.response?.status);
-    toast.error(err.response?.data?.message || "Failed to create post");
-      }
+      setShowDropdown(false);
+
+      // ✅ Inform parent about the new post (instant update)
+      const newPost = {
+        id: Date.now(),
+        author: "You",
+        user_id: JSON.parse(atob(localStorage.getItem("token").split(".")[1])).id,
+        content,
+        image_url: res.data?.image_url || null,
+        created_at: new Date().toISOString(),
+      };
+      if (onPostCreated) onPostCreated(newPost);
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to create post");
+    }
   };
 
   return (
     <div className={`mt-4 position-relative ${styles.postPanel}`}>
-      {/* Tabs with icons */}
+      {/* Tabs */}
       <div className={styles.tabs}>
         <button
           className={`${styles.tab} ${activeTab === "post" ? styles.active : ""}`}
@@ -152,12 +152,7 @@ export default function PostPanel() {
         <div>
           <label className="btn btn-light btn-sm border me-2">
             <i className="bi bi-image text-success me-1"></i> Attach Image
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              hidden
-            />
+            <input type="file" accept="image/*" onChange={handleImageChange} hidden />
           </label>
         </div>
 
