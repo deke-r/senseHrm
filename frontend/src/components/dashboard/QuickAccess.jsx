@@ -47,7 +47,7 @@ export default function QuickAccess() {
                   <p className="text-dark mb-1 f_13">Everyone is working today!</p>
                   <p className="text-muted small mb-0 f_12">No one is on leave today.</p>
                 </div>
-                <img src="../../../public/img/onLeave.png" alt="leave" width={125} className="me-2" />
+                <img src="/img/onLeave.png" alt="leave" width={125} className="me-2" />
               </div>
             </div>
           </div>
@@ -61,7 +61,7 @@ export default function QuickAccess() {
                   <p className="text-dark mb-1 f_13">Everyone is at office!</p>
                   <p className="text-muted small mb-0 f_12">No one is working remotely today.</p>
                 </div>
-                <img src="../../../public/img/workingRemotely.png" alt="remote" width={125} className="me-2" />
+                <img src="/img/workingRemotely.png" alt="remote" width={125} className="me-2" />
 
               </div>
             </div>
