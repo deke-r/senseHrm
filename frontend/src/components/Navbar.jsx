@@ -71,6 +71,7 @@ export default function Navbar() {
         <div className={styles.brand}>
           <Link to="/dashboard" className="text-decoration-none">
             <span className={styles.brandText}>SENSE PROJECTS</span>
+            {/* <img src="../../public/img/logo.png" width={250} /> */}
           </Link>
         </div>
       </div>
