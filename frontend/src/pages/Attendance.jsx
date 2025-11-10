@@ -1,4 +1,3 @@
-"use client";
 import React, { useState } from "react";
 import styles from "../style/Attendance.module.css";
 import Sidebar from "../components/Sidebar";
