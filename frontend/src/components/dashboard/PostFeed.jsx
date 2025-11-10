@@ -103,8 +103,9 @@ export default function PostFeed() {
 
               {userId === post.user_id && (
                 <button
-                  className="btn rounded-0 f_12"
+                  className="btn border-0 rounded-pill f_12"
                   onClick={() => confirmDelete(post)}
+                  style={{backgroundColor:'lightgray'}}
                 >
                   <Trash className="text-muted" size={16} />
                 </button>
