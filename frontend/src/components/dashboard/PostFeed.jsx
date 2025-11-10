@@ -4,6 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import styles from "../../style/DashboardSections.module.css";
 import PostPanel from "./PostPanel";
+import { Trash } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -11,6 +12,8 @@ export default function PostFeed() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedPost, setSelectedPost] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -39,28 +42,35 @@ export default function PostFeed() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this post?")) return;
+  // ✅ Open modal before delete
+  const confirmDelete = (post) => {
+    setSelectedPost(post);
+    setShowModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedPost) return;
+
     try {
-      await axios.delete(`${API_URL}/posts/${id}`, {
+      await axios.delete(`${API_URL}/posts/${selectedPost.id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      setPosts((prev) => prev.filter((p) => p.id !== id));
-      toast.success("Post deleted");
+      setPosts((prev) => prev.filter((p) => p.id !== selectedPost.id));
+      toast.success("Post deleted successfully");
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || "Failed to delete post");
+    } finally {
+      setShowModal(false);
+      setSelectedPost(null);
     }
   };
 
-  // ✅ Called when a post is created successfully
   const handlePostCreated = async (newPostData) => {
-    // Option 1: Optimistic update (add immediately)
     if (newPostData) {
       setPosts((prev) => [newPostData, ...prev]);
     } else {
-      // Option 2: Force re-fetch if no data returned
-      setTimeout(fetchPosts, 500); // small delay to ensure DB commit
+      setTimeout(fetchPosts, 500);
     }
   };
 
@@ -84,7 +94,7 @@ export default function PostFeed() {
             <div className="d-flex align-items-center justify-content-between mb-2">
               <div>
                 <p className="mb-0 fw-semibold text-dark f_14">
-                  {post.name || "Unknown User"}
+                  {post.author || post.name || "Unknown User"}
                 </p>
                 <small className="text-muted f_12">
                   {new Date(post.created_at).toLocaleString()}
@@ -93,10 +103,10 @@ export default function PostFeed() {
 
               {userId === post.user_id && (
                 <button
-                  className="btn btn-sm btn-outline-danger rounded-0 f_12"
-                  onClick={() => handleDelete(post.id)}
+                  className="btn rounded-0 f_12"
+                  onClick={() => confirmDelete(post)}
                 >
-                  Delete
+                  <Trash className="text-muted" size={16} />
                 </button>
               )}
             </div>
@@ -121,6 +131,50 @@ export default function PostFeed() {
             )}
           </div>
         ))
+      )}
+
+      {/* 🧱 Bootstrap Delete Confirmation Modal */}
+      {showModal && (
+        <div
+          className="modal fade show"
+          style={{ display: "block", background: "rgba(0,0,0,0.5)" }}
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content rounded-2 border-0 shadow-sm">
+              <div className="modal-header">
+                <h6 className="modal-title fw-semibold text-dark">
+                  Confirm Delete
+                </h6>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <p className="mb-0 f_14 text-muted">
+                  Are you sure you want to delete this post?
+                </p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-sm btn-secondary rounded-0"
+                  onClick={() => setShowModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-danger rounded-0"
+                  onClick={handleDelete}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
