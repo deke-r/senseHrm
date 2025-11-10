@@ -46,3 +46,25 @@ main {
 }
 
 
+
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #5E9C76; 
+  border-radius: 0px;
+  border: 2px solid #f5f5f5; 
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #4c7f61; 
+}
