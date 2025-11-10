@@ -14,6 +14,10 @@ import manageRoutes from './routes/manage.js';
 import manageEmployeeRoutes from "./routes/manageEmployees.js";
 import departmentRoutes from "./routes/departments.js";
 import hierarchyRoutes from "./routes/hierarchy.js";
+import announcementRoutes from "./routes/announcements.js";
+import employeeRoutes from "./routes/employees.js";
+
+
 
 import { fileURLToPath } from "url";
 
@@ -52,6 +56,8 @@ app.use("/api/manage", manageRoutes);
 app.use("/api/manage/employees", manageEmployeeRoutes);
 app.use("/api/departments", departmentRoutes);
 app.use("/api/hierarchy", hierarchyRoutes);
+app.use("/api/announcements", announcementRoutes);
+app.use("/api/birthdays", employeeRoutes);
 
 
 // Health check
