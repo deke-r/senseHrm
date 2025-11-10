@@ -7,6 +7,7 @@ import jsPDF from "jspdf";
 import styles from "../style/Profile.module.css";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
+import ChangePassword from "../components/ChangePassword";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -273,6 +274,8 @@ export default function ProfilePage() {
                 handleSave={handleSave}
                 handleEditClick={handleEditClick}
               />
+
+              <ChangePassword/>
             </div>
           </div>
         </div>

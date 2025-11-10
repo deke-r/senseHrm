@@ -3,6 +3,7 @@ import multer from "multer";
 import path from "path";
 import { verifyToken } from "../middleware/verifyToken.js";
 import pool from "../db/config.js";
+import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
@@ -179,6 +180,33 @@ router.put("/job", verifyToken, async (req, res) => {
     res.json({ success: true, message: "Job preference updated successfully" });
   } catch {
     res.status(500).json({ message: "Error updating job preference" });
+  }
+});
+
+
+router.put("/change-password", verifyToken, async (req, res) => {
+  try {
+    const { oldPassword, newPassword, confirmPassword } = req.body;
+
+    if (!oldPassword || !newPassword || !confirmPassword)
+      return res.status(400).json({ message: "All fields are required" });
+
+    if (newPassword !== confirmPassword)
+      return res.status(400).json({ message: "New passwords do not match" });
+
+    const [rows] = await pool.query("SELECT password FROM users WHERE id = ?", [req.user.id]);
+    if (!rows.length) return res.status(404).json({ message: "User not found" });
+
+    const isMatch = await bcrypt.compare(oldPassword, rows[0].password);
+    if (!isMatch) return res.status(400).json({ message: "Old password is incorrect" });
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await pool.query("UPDATE users SET password = ? WHERE id = ?", [hashedPassword, req.user.id]);
+
+    res.json({ success: true, message: "Password updated successfully ✅" });
+  } catch (err) {
+    console.error("❌ Error changing password:", err);
+    res.status(500).json({ message: "Error changing password" });
   }
 });
 
