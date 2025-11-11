@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "../../style/DashboardSections.module.css";
+import Holidays from "./Holidays";
 
 export default function QuickAccess() {
   return (
@@ -25,18 +26,8 @@ export default function QuickAccess() {
           </div>
 
           {/* Holidays */}
-          <div className="col-md-12">
-            <div className={`${styles.card} `}>
-              <h6 className="f_13 text-muted mb-3">Holidays</h6>
-              <div className="d-flex align-items-center justify-content-between">
-                <div>
-                  <p className="fw-semibold text-success mb-1 f_13">Gandhi Jayanti</p>
-                  <p className="small text-muted mb-0 f_12">Thu, 02 October, 2025</p>
-                </div>
-                <img src="/img/mahatma.png" alt="holiday" width={60} />
-              </div>
-            </div>
-          </div>
+
+          <Holidays />
 
           {/* On Leave Today */}
           <div className="col-md-12">

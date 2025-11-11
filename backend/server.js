@@ -16,6 +16,7 @@ import departmentRoutes from "./routes/departments.js";
 import hierarchyRoutes from "./routes/hierarchy.js";
 import announcementRoutes from "./routes/announcements.js";
 import employeeRoutes from "./routes/employees.js";
+import holidaysRouter from './routes/holidays.js'
 
 
 
@@ -58,6 +59,7 @@ app.use("/api/departments", departmentRoutes);
 app.use("/api/hierarchy", hierarchyRoutes);
 app.use("/api/announcements", announcementRoutes);
 app.use("/api/birthdays", employeeRoutes);
+app.use("/api/holidays", holidaysRouter);
 
 
 // Health check

@@ -67,6 +67,7 @@ export default function Sidebar() {
         { label: "Manage Employees", path: "/manage/employee" },
         { label: "Department Overview", path: "/manage/departments" },
         { label: "Annoucements Overview", path: "/manage/annoucements" },
+        { label: "Holidays Overview", path: "/manage/holidays" },
       ],
     },
   ];

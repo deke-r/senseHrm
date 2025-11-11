@@ -22,6 +22,7 @@ import ManageEmployees from "./pages/admin/ManageEmployees";
 import ManageDepartments from "./pages/admin/ManageDepartments";
 import HierarchyTree from "./pages/HierarchyTree";
 import ManageAnnouncements from "./pages/admin/ManageAnnouncements";
+import AdminHolidays from "./pages/admin/AdminHolidays";
 
 export default function App() {
   const { isAuthenticated, loading, user } = useAuth();
@@ -180,6 +181,14 @@ export default function App() {
           element={
             <ProtectedRoute requiredRole={["hr", "admin"]}>
               <ManageAnnouncements />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manage/holidays"
+          element={
+            <ProtectedRoute requiredRole={["hr", "admin"]}>
+              <AdminHolidays />
             </ProtectedRoute>
           }
         />
