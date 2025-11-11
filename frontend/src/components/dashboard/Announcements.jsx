@@ -35,7 +35,7 @@ export default function Announcements() {
   return (
     <div className={styles.panel}>
       <div className="d-flex justify-content-between align-items-center mb-2">
-        <h6 className="fw-semibold mb-0">Announcements</h6>
+        <h6 className="text-muted mb-0 f_13 ">Announcements</h6>
         <span className="badge bg-light text-dark f_12">
           {announcements.length || 0}
         </span>
