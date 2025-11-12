@@ -1,6 +1,5 @@
-
-
 import React, { useState, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -12,10 +11,12 @@ import ChangePassword from "../components/ChangePassword";
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 export default function ProfilePage() {
+  const { userId } = useParams(); // used when viewing another employee
   const [user, setUser] = useState(null);
   const [editingSection, setEditingSection] = useState(null);
   const [formData, setFormData] = useState({});
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [viewMode, setViewMode] = useState(false);
   const fileInputRef = useRef(null);
 
   // ✅ Fetch profile data
@@ -23,16 +24,21 @@ export default function ProfilePage() {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`${API_URL}/profile`, {
+        const endpoint = userId
+          ? `${API_URL}/profile/${userId}` // view others
+          : `${API_URL}/profile`; // self
+
+        const res = await axios.get(endpoint, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(res.data);
+        setViewMode(!!userId); // enable view-only if userId is present
       } catch (err) {
         console.error("Error fetching profile:", err);
       }
     };
     fetchProfile();
-  }, []);
+  }, [userId]);
 
   // 🧠 Handle input change
   const handleInputChange = (e) => {
@@ -42,6 +48,7 @@ export default function ProfilePage() {
 
   // ✏️ Enable editing
   const handleEditClick = (section) => {
+    if (viewMode) return; // disable edit in view mode
     setEditingSection(section);
     setFormData(user);
   };
@@ -84,6 +91,7 @@ export default function ProfilePage() {
 
   // 📸 Photo upload
   const handlePhotoChange = async (e) => {
+    if (viewMode) return; // disable in view-only
     const file = e.target.files[0];
     if (!file) return;
     setPhotoPreview(URL.createObjectURL(file));
@@ -107,46 +115,37 @@ export default function ProfilePage() {
     }
   };
 
-  const handlePhotoClick = () => fileInputRef.current.click();
+  const handlePhotoClick = () => {
+    if (!viewMode) fileInputRef.current.click();
+  };
 
-  // 🪪 Download ID card (credit card size)
-  // 🪪 Export ID Card centered on a full A4 PDF page (no stretch / crop)
+  // 🪪 Download ID card
   const downloadID = async () => {
     const card = document.getElementById("idCard");
     if (!card) return alert("ID Card not found!");
-
-    // Convert ID card div to canvas
     const canvas = await html2canvas(card, {
       scale: 3,
       useCORS: true,
       backgroundColor: "#fff",
     });
-
     const imgData = canvas.toDataURL("image/png");
-
-    // Create an A4 PDF (landscape or portrait as you like)
     const pdf = new jsPDF({
-      orientation: "portrait", // or "landscape"
+      orientation: "portrait",
       unit: "pt",
-      format: "a4", // full A4 sheet
+      format: "a4",
     });
 
-    // A4 page dimensions in points
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    // Keep the card at its natural scale (don’t stretch)
-    const imgWidth = canvas.width * 0.6; // control visible size (0.6 = ~60% of A4 width)
+    const imgWidth = canvas.width * 0.6;
     const imgHeight = (canvas.height / canvas.width) * imgWidth;
-
-    // Center the ID card on the A4 page
     const x = (pageWidth - imgWidth) / 2;
     const y = (pageHeight - imgHeight) / 2;
 
     pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight, undefined, "FAST");
     pdf.save(`${user.first_name || "Employee"}_ID.pdf`);
   };
-
 
   if (!user) return <div className="text-center mt-5">Loading profile...</div>;
 
@@ -161,26 +160,32 @@ export default function ProfilePage() {
           <div className={`rounded-2 ${styles.headerBanner}`}>
             <div className={styles.headerContent}>
               <div className={styles.profilePhotoSection}>
-                <div className={styles.profilePhotoWrapper} onClick={handlePhotoClick}>
+                <div
+                  className={styles.profilePhotoWrapper}
+                  onClick={handlePhotoClick}
+                  style={{ cursor: viewMode ? "default" : "pointer" }}
+                >
                   <img
                     src={
                       photoPreview
                         ? photoPreview
                         : user.photo_url
-                          ? `${API_URL.replace("/api", "")}${user.photo_url}`
-                          : "/placeholder.svg"
+                        ? `${API_URL.replace("/api", "")}${user.photo_url}`
+                        : "/placeholder.svg"
                     }
                     alt="Profile"
                     className={styles.profilePhoto}
                   />
                 </div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={handlePhotoChange}
-                />
+                {!viewMode && (
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handlePhotoChange}
+                  />
+                )}
               </div>
               <div className={styles.headerInfo}>
                 <div className={styles.nameSection}>
@@ -239,6 +244,7 @@ export default function ProfilePage() {
                 handleInputChange={handleInputChange}
                 handleSave={handleSave}
                 handleEditClick={handleEditClick}
+                viewMode={viewMode}
               />
 
               <ProfileSection
@@ -251,6 +257,7 @@ export default function ProfilePage() {
                 handleInputChange={handleInputChange}
                 handleSave={handleSave}
                 handleEditClick={handleEditClick}
+                viewMode={viewMode}
               />
 
               <ProfileSection
@@ -263,6 +270,7 @@ export default function ProfilePage() {
                 handleInputChange={handleInputChange}
                 handleSave={handleSave}
                 handleEditClick={handleEditClick}
+                viewMode={viewMode}
                 isList
               />
 
@@ -273,9 +281,10 @@ export default function ProfilePage() {
                 handleInputChange={handleInputChange}
                 handleSave={handleSave}
                 handleEditClick={handleEditClick}
+                viewMode={viewMode}
               />
 
-              <ChangePassword/>
+              {!viewMode && <ChangePassword />}
             </div>
           </div>
         </div>
@@ -295,7 +304,6 @@ export default function ProfilePage() {
           <button type="button" className="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
         <hr />
-
         <div className="offcanvas-body text-center">
           <div
             id="idCard"
@@ -330,7 +338,6 @@ export default function ProfilePage() {
                 {user.designation}
               </p>
             </div>
-
             <div style={{ padding: "15px 25px", textAlign: "left" }}>
               {[
                 ["Employee Number", user.id],
@@ -339,21 +346,17 @@ export default function ProfilePage() {
                 ["Email", user.email],
                 ["Location", user.head_office],
                 ["Blood Group", user.blood_group],
-              ].map(([label, value]) => (
-
-
-                <div className="row">
+              ].map(([label, value], idx) => (
+                <div className="row" key={idx}>
                   <div className="col-6 text-start">
                     <span className="f_10 fw-semibold text-muted">{label}</span>
                   </div>
                   <div className="col-6">
-
-                      <span className="text-start w-100 f_10 fw-semibold text-muted">{value || "N/A"}</span>
-              
+                    <span className="text-start w-100 f_10 fw-semibold text-muted">
+                      {value || "N/A"}
+                    </span>
                   </div>
                 </div>
-
-
               ))}
               <div style={{ textAlign: "center", marginTop: "15px" }}>
                 <img src="/img/sppl_logo.png" alt="SPPL" style={{ width: "80px", opacity: 0.9 }} />
@@ -370,7 +373,7 @@ export default function ProfilePage() {
   );
 }
 
-/* 🔹 Reusable Sections */
+/* 🔹 Reusable Section Components */
 
 const ProfileSection = ({
   title,
@@ -383,16 +386,19 @@ const ProfileSection = ({
   handleSave,
   handleEditClick,
   isList = false,
+  viewMode,
 }) => (
   <div className={`rounded-0 ${styles.card}`}>
     <div className={styles.cardHeader}>
       <h6 className={styles.cardTitle}>{title}</h6>
-      <button className={styles.editBtn} onClick={() => handleEditClick(section)}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-        </svg>
-      </button>
+      {!viewMode && (
+        <button className={styles.editBtn} onClick={() => handleEditClick(section)}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+        </button>
+      )}
     </div>
     {editingSection === section ? (
       <textarea
@@ -405,16 +411,16 @@ const ProfileSection = ({
       <ul className={styles.interestsList}>
         {user.interests
           ? user.interests.split(",").map((i, idx) => (
-            <li key={idx} className={styles.interestItem}>
-              <span className={styles.bullet}>•</span> {i.trim()}
-            </li>
-          ))
+              <li key={idx} className={styles.interestItem}>
+                <span className={styles.bullet}>•</span> {i.trim()}
+              </li>
+            ))
           : "No interests added"}
       </ul>
     ) : (
       <p className={styles.cardContent}>{user[field || section] || "N/A"}</p>
     )}
-    {editingSection === section && (
+    {editingSection === section && !viewMode && (
       <div className={styles.buttonGroup}>
         <button className={styles.saveBtn} onClick={() => handleSave(section)}>
           Save
@@ -434,16 +440,19 @@ const PersonalDetails = ({
   handleInputChange,
   handleSave,
   handleEditClick,
+  viewMode,
 }) => (
   <div className={`rounded-0 ${styles.card}`}>
     <div className={styles.cardHeader}>
       <h6 className={styles.cardTitle}>Primary Details</h6>
-      <button className={styles.editBtn} onClick={() => handleEditClick("personal")}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-        </svg>
-      </button>
+      {!viewMode && (
+        <button className={styles.editBtn} onClick={() => handleEditClick("personal")}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+        </button>
+      )}
     </div>
 
     <div className={styles.detailsGrid}>
@@ -460,15 +469,13 @@ const PersonalDetails = ({
       ].map(([label, name]) => (
         <div key={name} className={styles.detailCol}>
           <p className={styles.detailLabel}>{label}</p>
-          {editingSection === "personal" ? (
+          {editingSection === "personal" && !viewMode ? (
             name === "dob" ? (
               <input
                 type="date"
                 name="dob"
                 className={styles.input}
-                value={
-                  formData.dob ? new Date(formData.dob).toISOString().split("T")[0] : ""
-                }
+                value={formData.dob ? new Date(formData.dob).toISOString().split("T")[0] : ""}
                 onChange={handleInputChange}
               />
             ) : ["gender", "marital_status", "physically_handicapped"].includes(name) ? (
@@ -520,7 +527,7 @@ const PersonalDetails = ({
       ))}
     </div>
 
-    {editingSection === "personal" && (
+    {editingSection === "personal" && !viewMode && (
       <div className={styles.buttonGroup}>
         <button className={styles.saveBtn} onClick={() => handleSave("personal")}>
           Save

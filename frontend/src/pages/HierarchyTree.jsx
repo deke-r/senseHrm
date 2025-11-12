@@ -8,8 +8,11 @@ import IconButton from "@mui/material/IconButton";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
+import { jwtDecode } from "jwt-decode";
+
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
@@ -32,20 +35,28 @@ const StyledCard = styled(Card)(({ theme }) => ({
   boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
   background: "#fff",
   transition: "0.3s",
+  cursor: "pointer",
   "&:hover": {
     transform: "translateY(-2px)",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.12)"
-  }
+    boxShadow: "0 4px 10px rgba(0,0,0,0.12)",
+  },
 }));
 
 /* 🧱 Single employee node */
-function EmployeeNode({ emp }) {
+function EmployeeNode({ emp, currentUserId }) {
   const [collapsed, setCollapsed] = useState(false);
+  const navigate = useNavigate();
+
+  const handleNavigate = () => {
+    // ✅ open own profile or someone else's
+    if (emp.id === currentUserId) navigate(`/profile`);
+    else navigate(`/profile/${emp.id}`);
+  };
 
   return (
     <TreeNode
       label={
-        <StyledCard>
+        <StyledCard onClick={handleNavigate}>
           <Avatar
             src={getImageUrl(emp.photo_url)}
             alt={emp.name}
@@ -54,23 +65,27 @@ function EmployeeNode({ emp }) {
               height: 64,
               mb: 1,
               border: "2px solid #0B76D1",
-              objectFit: "cover"
+              objectFit: "cover",
             }}
           />
-          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600, textAlign: "center" }}>
             {emp.name}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center" }}>
             {emp.designation || "—"}
           </Typography>
+
           {emp.subordinates && emp.subordinates.length > 0 && (
             <IconButton
               size="small"
-              onClick={() => setCollapsed(!collapsed)}
+              onClick={(e) => {
+                e.stopPropagation(); // prevent card navigation
+                setCollapsed(!collapsed);
+              }}
               sx={{
                 mt: 1,
                 transform: collapsed ? "rotate(180deg)" : "rotate(0)",
-                transition: "0.2s"
+                transition: "0.2s",
               }}
             >
               <ExpandMoreIcon fontSize="small" />
@@ -81,7 +96,7 @@ function EmployeeNode({ emp }) {
     >
       {!collapsed &&
         emp.subordinates?.map((child) => (
-          <EmployeeNode key={child.id} emp={child} />
+          <EmployeeNode key={child.id} emp={child} currentUserId={currentUserId} />
         ))}
     </TreeNode>
   );
@@ -90,17 +105,29 @@ function EmployeeNode({ emp }) {
 /* 🧩 Main hierarchy component */
 export default function HierarchyTree() {
   const [data, setData] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // ✅ Decode token to get user id
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setCurrentUserId(decoded.id || decoded.userId || decoded.user?.id); // depends on your token payload
+      } catch (err) {
+        console.error("Error decoding token:", err);
+      }
+    }
     fetchHierarchy();
   }, []);
 
   const fetchHierarchy = async () => {
     try {
       const res = await axios.get(`${API_URL}/hierarchy`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      setData(res.data[0]); // top-most CMD/root
+      setData(res.data[0]); // top-most root (CMD/CEO)
     } catch (err) {
       console.error("❌ Error fetching hierarchy:", err);
     }
@@ -115,12 +142,15 @@ export default function HierarchyTree() {
           minHeight: "100vh",
           background: "#f9fafc",
           padding: "2rem 1rem",
-          overflowX: "auto"
+          overflowX: "auto",
         }}
       >
         <Box textAlign="center" mb={3}>
           <Typography variant="h5" fontWeight={600}>
             Organization Hierarchy
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Click any employee to view their profile
           </Typography>
         </Box>
 
@@ -131,7 +161,13 @@ export default function HierarchyTree() {
               lineColor={"#bbc"}
               lineBorderRadius={"12px"}
               label={
-                <StyledCard>
+                <StyledCard
+                  onClick={() =>
+                    currentUserId === data.id
+                      ? navigate("/profile")
+                      : navigate(`/profile/${data.id}`)
+                  }
+                >
                   <Avatar
                     src={getImageUrl(data.photo_url)}
                     alt={data.name}
@@ -140,7 +176,7 @@ export default function HierarchyTree() {
                       height: 72,
                       mb: 1,
                       border: "2px solid #0B76D1",
-                      objectFit: "cover"
+                      objectFit: "cover",
                     }}
                   />
                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
@@ -153,7 +189,7 @@ export default function HierarchyTree() {
               }
             >
               {data.subordinates?.map((emp) => (
-                <EmployeeNode key={emp.id} emp={emp} />
+                <EmployeeNode key={emp.id} emp={emp} currentUserId={currentUserId} />
               ))}
             </Tree>
           </Box>

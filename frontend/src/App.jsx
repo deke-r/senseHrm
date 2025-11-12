@@ -131,6 +131,16 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/profile/:userId"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+
 
         <Route
           path="/feed"
