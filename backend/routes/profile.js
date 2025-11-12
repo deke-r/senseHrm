@@ -210,4 +210,20 @@ router.put("/change-password", verifyToken, async (req, res) => {
   }
 });
 
+
+/* ===============================
+   👥 Get profile by ID (view-only)
+================================ */
+router.get("/:id", verifyToken, async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM users WHERE id = ?", [req.params.id]);
+    if (!rows.length) return res.status(404).json({ message: "User not found" });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("Error fetching profile by ID:", err);
+    res.status(500).json({ message: "Error fetching profile" });
+  }
+});
+
+
 export default router;
